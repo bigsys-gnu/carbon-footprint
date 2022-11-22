@@ -1,0 +1,3 @@
+[submodule "CarbonServerDjango"]
+	path = CarbonServerDjango
+	url = https://github.com/ChoiMoonSeok/CarbonServerDjango.git
