@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -28,7 +28,10 @@ schema_view = get_schema_view(
     openapi.Info(
         title="CarbonServer",
         default_version="0.0.0",
-        description="해당 서버는 bigsys data lab의 탄소 배출 측정 연구 과제를 위한 api 서버입니다.\n",
+        description="해당 서버는 bigsys data lab의 탄소 배출 측정 연구 과제를 위한 api 서버입니다.\n\
+            Login과 Signin을 제외한 모든 API는 jwt인증이 필요합니다.\n\
+                swagger 활용을 위해 api 인증이 필요한 경우, 우측의 Authorize 버튼을 눌러 검증한 후 실행하십시요.\n\
+                    ex) Bearer (User/Login에서 얻은 Access jwt)",
     ),
     public=True,
     permission_classes=[permissions.AllowAny],
@@ -52,26 +55,7 @@ urlpatterns = [
     ),
     # api의 url
     path("admin", admin.site.urls),
-    path(
-        "User/<str:Company>", views.User_EmployeeQuery.as_view(), name="get"
-    ),  # 조직설계에서 구성원 호출
-    path(
-        "Organization/<str:CompanyName>", views.CompanyQuery.as_view(), name="get"
-    ),  # 최상위회사 이름으로 조직 설계도 호출
-    path(
-        "Preview/<str:Depart>", views.PreviewQuery.as_view(), name="get"
-    ),  # 회사의 탄소 배출량 합계
-    path(
-        "PreviewInfo/<str:Depart>", views.PreviewInfoQuery.as_view(), name="put"
-    ),  # 회사의 정보 변경
-    path(
-        "CarbonEmission/<str:Depart>",
-        views.CarbonEmissionQuery.as_view(),
-        name="get",
-    ),
-    path(
-        "CarbonEmission/<str:Depart>",
-        views.CarbonEmissionQuery.as_view(),
-        name="post",
-    ),
+    path("User/", include("Human.urls")),
+    path("CarbonEmission/", include("Carbon.urls")),
+    path("Company/", include("Company.urls")),
 ]

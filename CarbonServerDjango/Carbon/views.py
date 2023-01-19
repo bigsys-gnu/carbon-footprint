@@ -6,164 +6,241 @@ from django.http import Http404
 from rest_framework import status
 from rest_framework.decorators import api_view
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.permissions import IsAuthenticated
+from drf_yasg import openapi
 
-from Carbon.serializer import *
+from . import models as CarModel
+from Human import models as HuModel
+from Company import models as ComModel
+from . import serializer
 import func
-
-# 사용자에 대한 api 함수
-
-User_root = "삼성"
-
-
-class User_EmployeeQuery(APIView):
-    """
-    모든 사용자를 리스트 형태로 반환하는 Api
-    ---
-    # 사용자
-    """
-
-    def get(self, request, Company, format=None):
-        Users = User_Employee.objects.filter(Company=Company)
-        serializer = User_EmployeeSerializer(Users, many=True)
-        return Response(serializer.data)
-
-
-class CompanyQuery(APIView):
-    """
-    회사와 관련된 값들을 다루는 api
-    """
-
-    def get(self, request, CompanyName, format=None):
-        """
-        지주회사가 동일한 모든 회사, 부서를 계층을 가진 형태로 반환.\
-        ex) 삼성 dict 내부의 Children에 리스트 형태로 자회사 혹은 부서가 저장됨.
-        """
-        ComId = Company.objects.get(ComName=CompanyName)
-        Departments = Department.objects.filter(Mother=ComId)
-        serializer = DepartmentSerializer(Departments, many=True)
-
-        result = {
-            "DepartmentName": CompanyName,
-            "depth": 0,
-            "Scope1": ComId.Scope1,
-            "Scope2": ComId.Scope2,
-            "Scope3": ComId.Scope3,
-            "Children": [],
-        }
-
-        for i in serializer.data:
-            i = dict(i)
-            i["Children"] = []
-            func.put_struct(result, i)
-
-        return Response(result, status=status.HTTP_201_CREATED)
-
-
-class PreviewQuery(APIView):
-    """
-    프리뷰와 관련된 내용을 다루는 api
-    """
-
-    def get(self, request, Depart, format=None):
-        """요청한 부서의 탄소 배출량을 탄소 배출 원인별로 계산해 반환"""
-
-        # 요청한 user의 모회사 확인
-        # Mother = User_Employee.objects.get(UID=jwt에서 추출한 id).Mother
-        Mother = User_root
-
-        # root의 id와 Department의 id 가져오기
-        Root_Id = Company.objects.get(ComName=Mother)
-        Upper_Id = Department.objects.get(DepartmentName=Depart)
-        Data = Carbon.objects.filter(Mother=Root_Id, upper=Upper_Id)
-
-        ans = {}
-
-        for i in Data:
-            try:
-                ans[func.CarbonCategory[i.Category]] += i.CarbonEmission
-            except KeyError:
-                ans[func.CarbonCategory[i.Category]] = i.CarbonEmission
-
-        return Response(ans, status=status.HTTP_201_CREATED)
-
-
-class PreviewInfoQuery(APIView):
-    def put(self, request, Depart, format=None):
-        """요청한 부서 혹은 회사의 정보를 변경"""
-
-        request = json.loads(request.body)
-
-        # 요청받은 즉 변경할 row 가져오기
-        try:
-            ChangeData = Company.objects.get(ComName=Depart)
-            ChangeData.ComName = request["DepartName"]
-            ChangeData.Classification = request["Classification"]
-            ChangeData.chief = User_Employee.objects.get(Name=request["chief"])
-            ChangeData.Description = request["Description"]
-            ChangeData.admin = User_Employee.objects.get(Name=request["admin"])
-            ChangeData.location = request["location"]
-            ChangeData.save()
-
-            serializer = CompanySerializer(ChangeData)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        except Company.DoesNotExist:
-            Mother_id = Company.objects.get(ComName=User_root)  # user의 모회사 확인
-
-            ChangeData = Department.objects.get(Mother=Mother_id, DepartmentName=Depart)
-            ChangeData.DepartmentName = request["DepartName"]
-            ChangeData.Classification = request["Classification"]
-            ChangeData.chief = User_Employee.objects.get(Name=request["chief"])
-            ChangeData.Description = request["Description"]
-            ChangeData.admin = User_Employee.objects.get(Name=request["admin"])
-            ChangeData.location = request["location"]
-            ChangeData.save()
-
-            serializer = DepartmentSerializer(ChangeData)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+from CarbonConstant import CarbonDef, CarbonClass
+from Swag import CarSwag
 
 
 class CarbonEmissionQuery(APIView):
+
+    permission_classes = (IsAuthenticated,)  # 로그인 검증
+
+    @swagger_auto_schema(
+        operation_summary="요청한 회사의 모든 탄소 배출원을 반환하는 Api",
+        responses={404: "입력한 회사가 존재하지 않음", 201: "API가 정상적으로 실행 됨"},
+    )
     def get(self, request, Depart, format=None):
-        """요청받은 부서, 회사의 모든 탄소 배출 반환"""
-        Mother_id = Company.objects.get(ComName=User_root)
-        try:  # 요청 받은 회사가 루트, 모회사인 경우
-            Upper_id = Department.objects.get(DepartmentName=Depart)
-            data = Carbon.objects.filter(Mother=Mother_id, upper=Upper_id)
-        except Department.DoesNotExist:
-            data = Carbon.objects.filter(Mother=Mother_id)
+        """{Depart}를 통해 입력 받은 회사의 이름을 바탕으로, 해당 회사의 모든 탄소 배출원을 반환합니다.\n
+        해당 회사의 탄소 배출 뿐만 아니라 해당 회사의 자회사, 부서의 탄소 배출원도 모두 포함합니다.\n
+        하단의 Description에 탄소 배출원을 알고 싶은 회사의 사명을 입력하면 됩니다.\n
+        탄소 배출원 예) 홍길동 교수님 출장, 탄소 배출량 20"""
 
-        serializer = CarbonSerializer(data, many=True)
+        UserRoot = func.GetUserRoot(request)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        try:  # 요청받은 회사가 루트가 아닌 경우
+            Root_id = ComModel.Department.objects.get(
+                DepartmentName=Depart, RootCom=UserRoot  # 로그인이 구현된 이후에는 사용자의 root와 비교
+            )
+        except ComModel.Department.DoesNotExist:  # 요청받은 회사가 루트인 경우
+            try:
+                Root_id = ComModel.Company.objects.get(ComName=Depart)
+            except ComModel.Company.DoesNotExist:  # 요청받은 회사가 존재하지 않는 경우
+                return Response(
+                    "This Company/Department doesn't exist.",
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
+        # 요청받은 회사가 루트인 경우
+        if type(Root_id) == ComModel.Company:
+
+            data = CarModel.Carbon.objects.filter(RootCom=Root_id)
+            serial = serializer.CarbonSerializer(data, many=True)
+
+            return Response(serial.data, status=status.HTTP_201_CREATED)
+
+        else:  # 요청 받은 회사가 루트, 모회사가 아닌 경우
+            Coms = [Root_id]
+            func.getChildDepart(Root_id.RootCom, Root_id.SelfCom, Coms)
+
+            CarbonList = []
+
+            for Com in Coms:
+
+                temp = CarModel.Carbon.objects.filter(BelongDepart=Com)
+                serial = serializer.CarbonSerializer(temp, many=True)
+                CarbonList += serial.data
+
+            return Response(CarbonList, status=status.HTTP_201_CREATED)
+
+    @swagger_auto_schema(
+        operation_summary="탄소 배출 원인을 입력하는 Api",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "Type": CarSwag.Type,
+                "DetailType": CarSwag.DetailType,
+                "CarbonData": CarSwag.CarbonData,
+            },
+        ),
+        responses={200: "데이터 입력 성공"},
+    )
     def post(self, request, Depart, format=None):
-        """탄소 사용량 데이터 입력"""
-        InputData = json.loads(request.body)
-        Mother_id = User_root
-        chief_id = User_Employee.objects.get(Name=InputData["chief"], Mother=Mother_id)
-        Mother_id_upper = Company.objects.get(ComName=Mother_id)
-        upper_id = Department.objects.get(Mother=Mother_id_upper, DepartmentName=Depart)
+        """
+        탄소 사용량 데이터를 입력하는 Api\n
+        로그인한 임직원이 자신이 직장 생활에서 발생시킨 탄소 배출량을 기록\n
+        """
 
-        # 요청한 탄소 배출 현황 생성
-        Carbon.objects.create(
-            Content=InputData["Content"],
-            Data=InputData["Data"],
-            unit=InputData["unit"],
-            CarbonEmission=InputData["CarbonEmission"],
-            StartDate=InputData["StartDate"],
-            EndDate=InputData["EndDate"],
-            location=InputData["location"],
-            chief=chief_id,
-            upper=upper_id,
-            Mother=Mother_id_upper,
-            Scope=InputData["Scope"],
-            Category=InputData["Category"],
-            Division=InputData["Division"],
+        UserRoot = func.GetUserRoot(request)
+
+        if Depart == UserRoot.ComName:
+            TargetCom = UserRoot
+        else:
+            TargetCom = ComModel.Department.objects.get(
+                RootCom=UserRoot, DepartmentName=Depart
+            )
+
+        CarbonData = request.data
+
+        CarType = CarbonData["Type"]
+        CarDetailType = CarbonData["DetailType"]
+        usage = float(CarbonData["CarbonData"]["usage"].split("/")[0])
+
+        DataKind = CarbonDef.CarbonCateMap["{}".format(CarType)][
+            "{}".format(CarDetailType)
+        ]
+
+        if DataKind in CarbonDef.CarbonCateMap["산림에의한흡수"]:
+            CarTrans = DataKind.CO2_EQ(
+                usage,
+                CarbonData["CarbonData"]["kind"],
+            )
+        elif DataKind == "에어컨":
+            CarTrans = DataKind.CO2_EQ(
+                usage,
+                CarbonData["CarbonData"]["nums"],
+                CarbonData["CarbonData"]["kind"],
+            )
+        elif DataKind == "냉장고":
+            CarTrans = DataKind.CO2_EQ(usage, CarbonData["CarbonData"]["nums"])
+        else:
+            CarTrans = DataKind.CO2_EQ(usage)
+
+        CarInfoTemp = CarModel.CarbonInfo.objects.create(
+            StartDate=CarbonData["CarbonData"]["StartDate"],
+            EndDate=CarbonData["CarbonData"]["EndDate"],
+            Location=CarbonData["CarbonData"]["Location"],
+            Scope=CarbonData["CarbonData"]["Scope"],
+            Chief=HuModel.Employee.objects.get(
+                RootCom=UserRoot, Name=CarbonData["CarbonData"]["Chief"]
+            ),
+            Category=CarbonDef.CarbonCategories.index(CarType),
+            Division=str(CarbonData),
         )
 
-        # 모회사의 모든 탄소 배출 가져오기
-        data = Carbon.objects.filter(Mother=Mother_id_upper, upper=upper_id)
-        serializer = CarbonSerializer(data, many=True)
+        if type(TargetCom) == ComModel.Company:
+            CarModel.Carbon.objects.create(
+                CarbonActivity=CarbonData["CarbonData"]["CarbonActivity"],
+                CarbonData=usage,
+                CarbonUnit=CarbonData["CarbonData"]["CarbonUnit"],
+                CarbonTrans=CarTrans,
+                RootCom=UserRoot,
+                BelongDepart=None,
+                CarbonInfo=CarInfoTemp,
+            )
+        else:
+            CarModel.Carbon.objects.create(
+                CarbonActivity=CarbonData["CarbonData"]["CarbonActivity"],
+                CarbonData=usage,
+                CarbonUnit=CarbonData["CarbonData"]["CarbonUnit"],
+                CarbonTrans=CarTrans,
+                RootCom=UserRoot,
+                BelongDepart=TargetCom,
+                CarbonInfo=CarInfoTemp,
+            )
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response("Add Carbon Data Success", status=status.HTTP_200_OK)
+
+
+class CarbonFixingQuery(APIView):
+    @swagger_auto_schema(
+        operation_summary="입력된 탄소 배출 원인을 삭제하는 Api",
+        responses={404: "입력한 회사가 존재하지 않음", 200: "API가 정상적으로 실행 됨"},
+    )
+    def delete(self, request, pk, format=None):
+        """
+        입력된 탄소 배출 원인 중 불필요한 내용을 삭제하는 Api\n
+        삭제할 탄소 배출 원인의 기본키를 입력하여야 한다.
+        """
+        try:
+            CarInfo = CarModel.Carbon.objects.get(
+                id=pk
+            ).CarbonInfo  # CarbonInfo가 CASCADE가 아니므로 먼저 삭제
+        except CarModel.Carbon.DoesNotExist:  # 삭제할 데이터가 존재하지 않는 경우
+            return Response(
+                "Request Data Doesn't Exist", status=status.HTTP_404_NOT_FOUND
+            )
+        CarInfoId = CarInfo.id
+        CarInfo.delete()  # CarbonInfo가 CASCADE가 아니므로 먼저 삭제
+        CarModel.Carbon.objects.get(id=pk).delete()
+
+        try:
+            CarModel.Carbon.objects.get(id=pk)
+        except CarModel.Carbon.DoesNotExist:
+            try:
+                CarModel.CarbonInfo.objects.get(id=CarInfoId)
+            except CarModel.CarbonInfo.DoesNotExist:
+                return Response("Delete Success", status=status.HTTP_200_OK)
+
+            return Response(
+                "Delete CarbonInfo Fail", status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        return Response("Delete Fail", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @swagger_auto_schema(
+        operation_summary="탄소 배출 원인을 수정하는 Api",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "DetailType": CarSwag.DetailType,
+                "CarbonData": CarSwag.CarbonData,
+            },
+        ),
+        responses={200: "데이터 입력 성공"},
+    )
+    def put(self, request, pk, format=None):
+        """
+        이전에 입력한 탄소 배출량 데이터를 수정하는 Api\n
+        이전에 입력한 내용과 동일한 카테고리 내에서 값들을 수정\n
+        불가능 예시) 고정연소인데 이동연소로 변경\n
+        아래의 데이터들을 모두 입력하여야 변경 가능\n
+        그렇지 않은 경우 오류가 발생함
+        """
+
+        UserRoot = func.GetUserRoot(request)
+
+        temp = CarModel.Carbon.objects.get(id=pk)
+        tempInfo = temp.CarbonInfo
+
+        InData = request.data
+
+        tempInfo.StartDate = InData["CarbonData"]["StartDate"]
+        tempInfo.EndDate = InData["CarbonData"]["EndDate"]
+        tempInfo.Location = InData["CarbonData"]["Location"]
+        tempInfo.Scope = InData["CarbonData"]["Scope"]
+        tempInfo.Chief = HuModel.Employee.objects.get(
+            RootCom=UserRoot, Name=InData["CarbonData"]["Chief"]
+        )
+        tempInfo.Division = str(InData)
+        tempInfo.save()
+
+        temp.CarbonActivity = InData["CarbonData"]["CarbonActivity"]
+        temp.CarbonData = float(InData["CarbonData"]["usage"].split("/")[0])
+        temp.CarbonUnit = InData["CarbonData"]["CarbonUnit"]
+        temp.CarbonTrans = CarbonDef.CarbonCateMap[
+            "{}".format(CarbonDef.CarbonCategories[tempInfo.Category])
+        ][InData["DetailType"]].CO2_EQ(
+            float(InData["CarbonData"]["usage"].split("/")[0])
+        )
+
+        temp.CarbonInfo = tempInfo
+        temp.save()
+        tempInfo.save()
+        return Response("Change Complete", status=status.HTTP_200_OK)
