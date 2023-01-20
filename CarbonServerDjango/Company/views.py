@@ -39,6 +39,8 @@ class CompanyQuery(APIView):
 
         result = ComSerial.ComStructSerializer(ComId)
         result = result.data
+        result["label"] = result["ComName"]
+        result["expand"] = True
         if result["Chief"] != None:
             result["Chief"] = HuModel.Employee.objects.get(id=result["Chief"]).Name
         result["Children"] = []
@@ -64,7 +66,7 @@ class CompanySimpleQuery(CompanyQuery):
         """
         요청한 회사에 대한 최소한의 정보를 반환하는 Api\n
         회사의 이름과 깊이만을 반환\n
-        프론트엔드에서 조직 설계도를 그릴 때 사용
+        프론트엔드에서 Preview 정보 화면을 그릴 때 사용
         """
 
         UserRoot = func.GetUserRoot(request)
@@ -111,7 +113,7 @@ class PreviewQuery(APIView):
 
     @swagger_auto_schema(
         operation_summary="Preview 화면에서 필요한 값들을 반환하는 Api",
-        responses={200: "Api가 정상적으로 동작함"},
+        responses={200: "Api가 정상적으로 동작함", 406: "날짜가 범위를 초과함"},
     )
     def get(self, request, Depart, start, end, format=None):
         """
@@ -145,12 +147,17 @@ class PreviewQuery(APIView):
 
         Carbons = []
         for depart in Departs:
-            temp = CarModel.Carbon.objects.filter(
-                BelongDepart=depart,
-                CarbonInfo__StartDate__gte=datetime.strptime(start, "%Y-%m-%d"),
-                CarbonInfo__EndDate__lte=datetime.strptime(end, "%Y-%m-%d"),
-            )
-            Carbons.append(temp)
+            try:
+                temp = CarModel.Carbon.objects.filter(
+                    BelongDepart=depart,
+                    CarbonInfo__StartDate__gte=datetime.strptime(start, "%Y-%m-%d"),
+                    CarbonInfo__EndDate__lte=datetime.strptime(end, "%Y-%m-%d"),
+                )
+                Carbons.append(temp)
+            except ValueError:  # 날짜가 범위를 초과한 경우 ex) 1월 35일
+                return Response(
+                    "Date out of range", status=status.HTTP_406_NOT_ACCEPTABLE
+                )
 
         scope1 = 0
         scope2 = 0
@@ -158,12 +165,17 @@ class PreviewQuery(APIView):
         categories = [0] * CarbonDef.CarbonCateLen
 
         if IsRoot == 1:  # 요청한 데이터가 루트인 경우 depart가 아니라 데이터를 가져오지 못하므로 따로 가져옴
-            temp = CarModel.Carbon.objects.filter(
-                BelongDepart=None,
-                CarbonInfo__StartDate__gte=datetime.strptime(start, "%Y-%m-%d"),
-                CarbonInfo__EndDate__lte=datetime.strptime(end, "%Y-%m-%d"),
-            )
-            Carbons.append(temp)
+            try:
+                temp = CarModel.Carbon.objects.filter(
+                    BelongDepart=None,
+                    CarbonInfo__StartDate__gte=datetime.strptime(start, "%Y-%m-%d"),
+                    CarbonInfo__EndDate__lte=datetime.strptime(end, "%Y-%m-%d"),
+                )
+                Carbons.append(temp)
+            except ValueError:  # 날짜가 범위를 초과한 경우 ex) 1월 35일
+                return Response(
+                    "Date out of range", status=status.HTTP_406_NOT_ACCEPTABLE
+                )
 
         for car in Carbons:
             for each in car:
@@ -176,16 +188,13 @@ class PreviewQuery(APIView):
                     scope3 += each.CarbonTrans
 
                 TempCate = each.CarbonInfo.Category
-                for i in range(CarbonDef.CarbonCateLen):
-                    if i == TempCate:
-                        categories[i] += each.CarbonTrans
-                        break
+                categories[TempCate] += each.CarbonTrans
 
         ans = {
             "Name": Depart,
-            "Scopes": [scope1, scope2, scope3],
+            "Scopes": [round(scope1, 2), round(scope2, 2), round(scope3, 2)],
             "EmissionList": [
-                {CarbonDef.CarbonCategories[i]: categories[i]}
+                {CarbonDef.CarbonCategories[i]: round(categories[i], 2)}
                 for i in range(CarbonDef.CarbonCateLen)
             ],
         }
@@ -237,12 +246,19 @@ class PreviewInfoQuery(APIView):
         # 데이터 변경
         try:
 
-            ChangeData.ComName = request["ComName"]
-            ChangeData.Classification = request["Classification"]
-            ChangeData.Chief = HuModel.Employee.objects.get(Name=request["Chief"])
-            ChangeData.Description = request["Description"]
-            ChangeData.Admin = HuModel.Employee.objects.get(Name=request["Admin"])
-            ChangeData.Location = request["Location"]
+            if request["ComName"] != None:
+                ChangeData.ComName = request["ComName"]
+            if request["Classification"] != None:
+                ChangeData.Classification = request["Classification"]
+            if request["Chief"] != None:
+                ChangeData.Chief = HuModel.Employee.objects.get(Name=request["Chief"])
+            if request["Admin"] != None:
+                ChangeData.Admin = HuModel.Employee.objects.get(Name=request["Admin"])
+            if request["Description"] != None:
+                ChangeData.Description, request["Description"]
+
+            if request["Location"] != None:
+                ChangeData.Location = request["Location"]
             ChangeData.save()
 
             serial = ComSerial.CompanySerializer(ChangeData)

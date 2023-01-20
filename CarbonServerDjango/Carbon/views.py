@@ -100,59 +100,36 @@ class CarbonEmissionQuery(APIView):
 
         CarType = CarbonData["Type"]
         CarDetailType = CarbonData["DetailType"]
+
         usage = float(CarbonData["CarbonData"]["usage"].split("/")[0])
 
         DataKind = CarbonDef.CarbonCateMap["{}".format(CarType)][
             "{}".format(CarDetailType)
         ]
 
-        if DataKind in CarbonDef.CarbonCateMap["산림에의한흡수"]:
+        if CarDetailType in CarbonDef.CarbonCateMap["산림에의한흡수"]:
             CarTrans = DataKind.CO2_EQ(
                 usage,
                 CarbonData["CarbonData"]["kind"],
             )
-        elif DataKind == "에어컨":
+        elif CarDetailType == "에어컨":
             CarTrans = DataKind.CO2_EQ(
                 usage,
                 CarbonData["CarbonData"]["nums"],
                 CarbonData["CarbonData"]["kind"],
             )
-        elif DataKind == "냉장고":
+        elif CarDetailType == "냉장고":
             CarTrans = DataKind.CO2_EQ(usage, CarbonData["CarbonData"]["nums"])
         else:
             CarTrans = DataKind.CO2_EQ(usage)
 
-        CarInfoTemp = CarModel.CarbonInfo.objects.create(
-            StartDate=CarbonData["CarbonData"]["StartDate"],
-            EndDate=CarbonData["CarbonData"]["EndDate"],
-            Location=CarbonData["CarbonData"]["Location"],
-            Scope=CarbonData["CarbonData"]["Scope"],
-            Chief=HuModel.Employee.objects.get(
-                RootCom=UserRoot, Name=CarbonData["CarbonData"]["Chief"]
-            ),
-            Category=CarbonDef.CarbonCategories.index(CarType),
-            Division=str(CarbonData),
-        )
+        CarInfoTemp = func.CreateCarbonInfo(CarbonData, UserRoot, CarType)
 
         if type(TargetCom) == ComModel.Company:
-            CarModel.Carbon.objects.create(
-                CarbonActivity=CarbonData["CarbonData"]["CarbonActivity"],
-                CarbonData=usage,
-                CarbonUnit=CarbonData["CarbonData"]["CarbonUnit"],
-                CarbonTrans=CarTrans,
-                RootCom=UserRoot,
-                BelongDepart=None,
-                CarbonInfo=CarInfoTemp,
-            )
+            func.CreateCarbon(CarbonData, CarTrans, usage, UserRoot, None, CarInfoTemp)
         else:
-            CarModel.Carbon.objects.create(
-                CarbonActivity=CarbonData["CarbonData"]["CarbonActivity"],
-                CarbonData=usage,
-                CarbonUnit=CarbonData["CarbonData"]["CarbonUnit"],
-                CarbonTrans=CarTrans,
-                RootCom=UserRoot,
-                BelongDepart=TargetCom,
-                CarbonInfo=CarInfoTemp,
+            func.CreateCarbon(
+                CarbonData, round(CarTrans, 4), usage, UserRoot, TargetCom, CarInfoTemp
             )
 
         return Response("Add Carbon Data Success", status=status.HTTP_200_OK)
@@ -221,19 +198,28 @@ class CarbonFixingQuery(APIView):
 
         InData = request.data
 
-        tempInfo.StartDate = InData["CarbonData"]["StartDate"]
-        tempInfo.EndDate = InData["CarbonData"]["EndDate"]
-        tempInfo.Location = InData["CarbonData"]["Location"]
-        tempInfo.Scope = InData["CarbonData"]["Scope"]
-        tempInfo.Chief = HuModel.Employee.objects.get(
-            RootCom=UserRoot, Name=InData["CarbonData"]["Chief"]
-        )
+        if InData["CarbonData"]["StartDate"] != None:
+            tempInfo.StartDate = InData["CarbonData"]["StartDate"]
+        if InData["CarbonData"]["EndDate"] != None:
+            tempInfo.EndDate = InData["CarbonData"]["EndDate"]
+        if InData["CarbonData"]["Location"] != None:
+            tempInfo.Location = InData["CarbonData"]["Location"]
+        if InData["CarbonData"]["Scope"] != None:
+            tempInfo.Scope = InData["CarbonData"]["Scope"]
+        if InData["CarbonData"]["Chief"] != None:
+            tempInfo.Chief = HuModel.Employee.objects.get(
+                RootCom=UserRoot, Name=InData["CarbonData"]["Chief"]
+            )
         tempInfo.Division = str(InData)
         tempInfo.save()
 
-        temp.CarbonActivity = InData["CarbonData"]["CarbonActivity"]
-        temp.CarbonData = float(InData["CarbonData"]["usage"].split("/")[0])
-        temp.CarbonUnit = InData["CarbonData"]["CarbonUnit"]
+        if InData["CarbonData"]["CarbonActivity"] != None:
+            temp.CarbonActivity = InData["CarbonData"]["CarbonActivity"]
+        if InData["CarbonData"]["usage"] != None:
+            temp.CarbonData = float(InData["CarbonData"]["usage"].split("/")[0])
+        if InData["CarbonData"]["CarbonUnit"] != None:
+            temp.CarbonUnit = InData["CarbonData"]["CarbonUnit"]
+
         temp.CarbonTrans = CarbonDef.CarbonCateMap[
             "{}".format(CarbonDef.CarbonCategories[tempInfo.Category])
         ][InData["DetailType"]].CO2_EQ(
