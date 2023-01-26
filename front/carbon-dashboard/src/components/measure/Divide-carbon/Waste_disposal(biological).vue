@@ -13,8 +13,8 @@
         <input type="text" class="addInfo_input" id ="building_name_input" placeholder="성남시" style="margin-left:72px;">
     </div>
     <div style="margin-top:30px">처리날짜
-        <input class = "date_btn" id = "start_data" type="date" data-placeholder="시작 날짜" required aria-required="true" style="margin-left:82px;">
-        <input class = "date_btn" id = "end_data" type="date">
+        <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true" style="margin-left:82px;">
+        <input class = "date_btn" id = "end_data" type="month">
     </div>
     <div class="add_info_divide" >처리 용량
         <input class="addInfo_input" id="waste_usage_input" placeholder="12,456">
@@ -72,13 +72,22 @@ import {ref, computed} from 'vue'
         setup(){
             const store = useStore()
             function click_regi_btn(){
-                var info_list = {content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"Scope1",category:"13"}
+                var info_list = {
+                    content:"",
+                    data:"",
+                    emissions:"",
+                    StartDate:"",
+                    EndDate:"",
+                    scope:1,
+                    category:"17",
+                    unit:"ton"
+                }
                 var usage_input = document.getElementById('waste_usage_input').value
                 info_list.content = document.getElementById('carbon_emissions_content').value
-                info_list.data =  usage_input+"ton"
+                info_list.data =  usage_input+"/"+"ton"
                 info_list.emissions = usage_input+4
-                info_list.StartDate = document.getElementById('start_data').value
-                info_list.EndDate = document.getElementById('end_data').value
+                info_list.StartDate = document.getElementById('start_data').value+'-01'
+                info_list.EndDate = document.getElementById('end_data').value+'-01'
                 
                 store.commit("SetTableContent",info_list)
             }

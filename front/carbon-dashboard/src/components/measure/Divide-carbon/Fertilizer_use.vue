@@ -9,8 +9,8 @@
         <input type="text" class="addInfo_input" id="carbon_emissions_content">
     </div> 
     <div style="margin-top:30px">기간 설정
-        <input class = "date_btn" id = "start_data" type="date" data-placeholder="시작 날짜" required aria-required="true">
-        <input class = "date_btn" id = "end_data" type="date">
+        <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true">
+        <input class = "date_btn" id = "end_data" type="month">
     </div>
 
     <div class="add_info_divide" id="building_name_text" style="margin-top:4vh">비료 사용 위치
@@ -18,12 +18,19 @@
     </div>
     <div class="add_info_divide">비료 분류
         <select v-model="fertilzer" class="addInfo_input" id="supplier_drop"  style="margin-left:90px">
-            <option value="0">석회비료</option>
-            <option value="1">요소비료</option>
-            <option value="2">질소질비료</option>
+            <option value="석회비료">석회비료</option>
+            <option value="요소비료">요소비료</option>
+            <option value="질소질비료">질소질비료</option>
         </select>
     </div>
-    <div v-if="fertilzer==2">
+    <div class="add_info_divide" v-if="fertilzer == '석회비료'"> 세부 비료 
+        <select v-model="kind" class="addInfo_input" id="supplier_drop"  style="margin-left:90px">
+            <option value="석회고토">석회고토</option>
+            <option value="석회석">석회석</option>
+            <option value="패화석">패화석</option>
+        </select>
+    </div>
+    <div v-if="fertilzer=='요소비료'">
         <div class="add_info_divide" >유기질 비료 시비량
             <input class="addInfo_input" id="usage_input" placeholder="12,456" style="margin-left:1.6vw;">
             <select class="addInfo_input" id="power_usage_drop">
@@ -50,24 +57,41 @@ import {ref,computed} from 'vue'
     export default {
         name :"power_usage",
         setup(){
-            var fertilzer = ref("0")
+            var fertilzer = ref("석회비료")
+            var kind = ref("석회고토")
             const store = useStore()
 
             function click_regi_btn(){
-                var info_list = {content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"Scope1", category:"7"}
+                var info_list = {
+                    DetailType:"",
+                    StartDate:"",
+                    EndDate:"",
+                    Location:"",
+                    scope:1, 
+                    usage:"",
+                    unit:"ton",
+                    category:"4",
+                    CarbonActivity:"",
+                    kind:"", 
+                    Division:{비료사용위치:""},
+                    emissions:"",
+                }
                 var usage_input = document.getElementById('usage_input').value
-                info_list.content = document.getElementById('carbon_emissions_content').value
-                info_list.data =  usage_input+"ton"
+                info_list.CarbonActivity = document.getElementById('carbon_emissions_content').value
+                info_list.usage =  usage_input+"/ton"
                 info_list.emissions = usage_input+4
-                info_list.StartDate = document.getElementById('start_data').value
-                info_list.EndDate = document.getElementById('end_data').value
-                
+                info_list.StartDate = document.getElementById('start_data').value+'-01'
+                info_list.EndDate = document.getElementById('end_data').value+'-01'
+                info_list.DetailType = fertilzer.value
+                info_list.kind = kind.value
+                info_list.Division.비료사용위치= document.getElementById('building_name_input').value+'-01'
                 console.log(info_list)
                 store.commit("SetTableContent",info_list)
 
             }
             return{ 
                 fertilzer,
+                kind,
                 click_regi_btn
             }
         },

@@ -3,8 +3,8 @@
     <span class="edit-group-title">조직도 편집</span>
     <button class="edit-group-title" id="addGroup_del" @click="OffEditGroup">X</button>
     <div class="add-group-iinput">
-        <TreeListVue></TreeListVue>
-
+        
+        <Tree />
     </div>
     <button class="add-group-commit" @click="OffEditGroup">저장하기</button>
 </div>
@@ -54,11 +54,14 @@
 <script>
 import { useStore } from "vuex";
 import TreeListVue from "../measure/Tree-list.vue";
+//import Tree from "vue3-treeview";
+import Tree from './AddGroupTree.vue'
 
 export default{ 
     name:'',
     components:{
-        TreeListVue
+        TreeListVue,
+        Tree
     },
     setup(){
         const store = useStore(); //vuex 사용

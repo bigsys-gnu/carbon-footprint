@@ -12,8 +12,8 @@
                 <textarea class="addInfo_input" id="carbon_emissions_content_forest" rows="8" style="height:12vh; width:25vw"></textarea>
                 </div> 
                 <div style="margin-top:30px; width:25vw">기간 설정<br>
-                    <input class = "date_btn" id = "start_data" type="date" data-placeholder="시작 날짜" required aria-required="true" style="margin-top:2vh; margin-left:0px; height:3.5vh">
-                    <input class = "date_btn" id = "end_data" type="date" style="margin-left:3vw; height:3.5vh">
+                    <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true" style="margin-top:2vh; margin-left:0px; height:3.5vh">
+                    <input class = "date_btn" id = "end_data" type="month" style="margin-left:3vw; height:3.5vh">
                 </div>
                 <div style="margin-top:30px; font-size:1.8vh">구분
                     <div class="add_info_divide" id="building_name_text" style="margin-top:4vh; width:25vw;">건물명 / 배출 시설명
@@ -87,17 +87,16 @@ import {computed, ref} from 'vue'
             const store = useStore()
             var selected = computed(()=>store.state.selected_row);
             function click_edit_btn(){
-                var info_list = {content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"Scope1", category:"9"}
+                var info_list = {content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"1", category:"6"}
                 var usage_input = document.getElementById('usage_input').value
                 info_list.content = document.getElementById('carbon_emissions_content_forest').value
-                info_list.data =  usage_input+"ha"
+                info_list.data =  usage_input+"/"+"ha"
                 info_list.emissions = usage_input+4
-                info_list.StartDate = document.getElementById('start_data').value
-                info_list.EndDate = document.getElementById('end_data').value
+                info_list.StartDate = document.getElementById('start_data').value+'-01'
+                info_list.EndDate = document.getElementById('end_data').value+'-01'
                 var table = computed(() => store.state.table_kind)
                 if(table.value == 'total_table'){
-                    store.commit("SetTotalTableContent",info_list);
-                    store.commit('DelTotalTableContent',selected.value);
+                    //수정 API 연결
                 }
                 else if(table.value == 'table'){
                     store.commit("SetTableContent",info_list);

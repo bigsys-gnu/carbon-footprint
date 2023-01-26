@@ -10,7 +10,15 @@
       @dragging="(e) => onEvent('dragging', e)" style="border: 1px solid black">
                
             </PinchScrollZoom>     줌 기능 -->
-            <GroupTree>  </GroupTree> 
+           
+            <Suspense>
+                <template #default>
+                    <GroupTree>  </GroupTree>
+                </template>
+                <template #fallback>
+                    <div>Loading...</div>
+                </template>
+            </Suspense>
             <GroupAdd class="add-group" v-if="AddisView"/>
             <GroupPreview class="group-preview" v-if="Preview=='total'"/>
             <GroupPreviewDetail class="group-preview" v-if="Preview=='detail'"/>

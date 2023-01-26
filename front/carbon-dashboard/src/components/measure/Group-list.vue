@@ -256,7 +256,9 @@ import { ref,computed } from "vue"
               "Content-Type": "text/html; charset=utf-8",
             }
           }
-            async function  get_list(){
+            
+
+            async function title_get_list_(){
                 console.log("dawdaw")
                 await axios.get("Company/Organization/Simple/samsung",config).then(res => {
                     console.log(res.data)
@@ -272,6 +274,9 @@ import { ref,computed } from "vue"
                 })
                 .finally(() => {})
             }
+
+            
+            
             return{
                 group_name,
                 titleclick,
@@ -284,11 +289,12 @@ import { ref,computed } from "vue"
                 clickChart,
                 select_category,
                 click_regi_page,
-                get_list
+                title_get_list_,
+                
             }
         },
         created(){
-            this.get_list()
+            this.title_get_list_()
         },
         methods:{
 

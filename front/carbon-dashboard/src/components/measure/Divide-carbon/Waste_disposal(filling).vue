@@ -12,7 +12,7 @@
         <input type="text" class="addInfo_input" style="margin-left:94px;" id ="building_name_input" placeholder="경상대 본관">
     </div>
     <div style="margin-top:30px">매립 시작 날짜
-        <input class = "date_btn" id = "start_data" type="date" data-placeholder="시작 날짜" required aria-required="true">
+        <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true">
     </div>
 
     <div class="add_info_divide">폐기물 분류
@@ -107,13 +107,22 @@ import {ref, computed} from 'vue'
                 "폐수 슬러지"
             ])
             function click_regi_btn(){
-                var  info_list = {content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"Scope1", category:"10"}
+                var  info_list = {
+                    content:"",
+                    data:"",
+                    emissions:"",
+                    StartDate:"",
+                    EndDate:"",
+                    scope:1, 
+                    category:"14",
+                    unit:"ton"
+                }
                 var usage_input = document.getElementById('steam_usage_input').value
 
                 info_list.content = document.getElementById('carbon_emissions_content').value
-                info_list.data =  usage_input+"ton"
+                info_list.data =  usage_input+"/"+"ton"
                 info_list.emissions = usage_input+4
-                info_list.StartDate = document.getElementById('start_data').value
+                info_list.StartDate = document.getElementById('start_data').value+'-01'
                 //info_list.EndDate = document.getElementById('end_data').value
                 
                 store.commit("SetTableContent",info_list)

@@ -10,8 +10,8 @@
             <input type="text" class="addInfo_input" id="carbon_emissions_content">
         </div> 
         <div style="margin-top:30px">기간 설정
-            <input class = "date_btn" id = "start_data" type="date" data-placeholder="시작 날짜" required aria-required="true">
-            <input class = "date_btn" id = "end_data" type="date">
+            <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true">
+            <input class = "date_btn" id = "end_data" type="month">
         </div>
         <div style="margin-top:4vh">구분</div>
         <div class="add_info_divide" style="margin-top:4vh">기기분류
@@ -97,13 +97,13 @@ import {ref,computed} from "vue"
             const store = useStore()
             var device =ref('냉장고')
             function click_regi_btn(){
-                var info_list={content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"Scope1",category:"6"}
+                var info_list={content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:1,category:"2",unit:"g"}
                 var usage_input = document.getElementById('amount_refrigerant').value
                 info_list.content = document.getElementById('carbon_emissions_content').value
-                info_list.data =  usage_input+"g"
+                info_list.data =  usage_input+"/g"
                 info_list.emissions = usage_input+4
-                info_list.StartDate = document.getElementById('start_data').value
-                info_list.EndDate = document.getElementById('end_data').value
+                info_list.StartDate = document.getElementById('start_data').value+'-01'
+                info_list.EndDate = document.getElementById('end_data').value+'-01'
 
                 store.commit("SetTableContent",info_list)
             }

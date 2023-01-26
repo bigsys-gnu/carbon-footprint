@@ -4,24 +4,14 @@
       <span class="addGroup_tree_text">전체</span> <span class="addGroup_tree_text" style="color:#3DC984">{{ num }}</span>
       <button class="addGroup_tree_btnAdd"  @click="addNode()">+　추가하기</button>
     </div>
-    <tree
-    :nodes="nodes"
-    :config="config"
-    @nodeOpened="log(`node-opened`)"
-    @nodeClosed="log('node-closed')"
-    @nodeFocus="log('node-focus')"
-    @nodeToggle="log('node-toggle')"
-    @nodeBlur="log('node-blur')"
-    @nodeEdit="log('node-edit')"
-    @nodeChecked="log('node-checked')"
-    @nodeUnchecked="log('node-unchecked')"
-    @nodeDragstart="log('node-dragstart')"
-    @nodeDragenter="log('node-dragenter')"
-    @nodeDragleave="log('node-dragleave')"
-    @nodeDragend="log('node-dragend')"
-    @nodeOver="log('node-over')"
-    @nodeDrop="log('node-drop')"
-     />
+    <Tree style="color:black; font-size:2vh;margin-top:5vh"
+    :nodes="data"
+    :use-icon="true"
+    :use-checkbox="true"
+    :use-expandable="true"
+    use-row-delete
+    @nodeClick="onNodeClick"
+    />
     <div class="addGroup_initInput">
       <input class="addGroup_initInput_check" type="checkbox"/>
       <input @keyup.enter="addNode(group_name)" v-model="group_name" class="addGroup_initInput_input" placeholder="조직이름을 설정해주세요"/>
@@ -121,6 +111,7 @@ export default {
         ],
       },
     ]);
+    var selected = ref("");
     const searchText = ref("");
     const onNodeExpanded = (node, state) => {
       console.log("state: ", state);
@@ -131,7 +122,9 @@ export default {
       console.log("nodes:", nodes);
     };
     const onNodeClick = (node) => {
-      console.log("클릭된 노드",node);
+      selected.value = node
+      console.log("클릭된 노드",selected.value);
+      
     }
     var num = data.value.length
     console.log(num)
@@ -144,7 +137,7 @@ export default {
       enter_btn.value = false
     }
     function addNode(name){
-      var list = {id:"7",label:name,nodes:""}
+      var list = {id:num,label:name,nodes:""}
       data.value.push(list)
       console.log(data.value)
     }

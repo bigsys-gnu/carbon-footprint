@@ -186,33 +186,32 @@
             ])
 
             function setCategory(name){
-                return "경상대"+" > "+"공과대학"+" > "+name
+                return name
             }
 
             function click_total_regi(){
                 store.commit('SetTotalTableContent',table.value)
             }
 
-            function get_all_info(){
-                axios.get("/Company/preview/")
-                .then(res => {
-                    console.log(res)
-                    /*
-                    scope12CarbonEmission = res.scope12;
-                    scope3CarbonEmission = res.scope3;
-                    */
+            var config = {
+            headers:{
+                "Authorization":"Bearer"+" "+store.state.accessToken
+            
+            }
+            }
+            async function get_total_emission(){
+                await axios.get("Company/Preview/samsung/2023-0"+month.value+"-01/2023-0"+month.value+"-28",config).then(res => {
+                    //scope12CarbonEmission.value = res.data.Scopes[0]+res.data.Scopes[1]
+                    //scope3CarbonEmission.value = res.data.Scopes[2]
                 })
-                .catch(error => {})
-                .finally(() => {})
-                    list_category.values=[
-                        {category:"1", image:'building.png' ,name:"경상대", check:''},
-                        {category:"2" ,image:'중', name:"상경대학", check:''}, 
-                        {category:"2" ,image:'공', name:"공과대학", check:''}, 
-                        {category:"3" ,image:'경', name:"경영학과", check:''},   
-                        {category:"3" ,image:'항', name:"항공우주 및 소프트웨어학과", check:''},
-                        {category:"3" ,image:'건', name:"건축공학과", check:''},                  
-                    ];
-            }        
+                .catch(error => {
+                    
+                    console.log(error)
+                    
+                })
+                .finally(() => {
+                })
+           }        
             return{
                 N_emssions,
                 M_emssions,
@@ -220,8 +219,7 @@
                 info_Group_Text,
                 emssion_info_list_parent,
                 setCategory,
-                get_all_info,
-                click_total_regi,
+                click_total_regi,get_total_emission
                
             }
         },

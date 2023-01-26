@@ -15,7 +15,7 @@
                 <input type="text" class="addInfo_input" style="margin-left:94px; width:11.5vw; height:3.5vh" id ="building_name_input" placeholder="경상대 본관">
             </div>
             <div style="margin-top:30px; font-size:1.4vh">매립 시작 날짜
-                <input class = "date_btn" id = "start_data" type="date" data-placeholder="시작 날짜" required aria-required="true">
+                <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true">
             </div>
 
             <div class="add_info_divide">폐기물 분류
@@ -83,7 +83,7 @@
 <script>
 import {useStore} from 'vuex'
 import {ref, computed} from 'vue'
-
+import axios from "axios";
     export default {
         name :"waste_disposal_filling",
         setup(){
@@ -117,27 +117,61 @@ import {ref, computed} from 'vue'
                 "하수 슬러지",
                 "폐수 슬러지"
             ])
-            function click_edit_btn(){
-                var  info_list = {content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"Scope1",category:"10"}
+            async function click_edit_btn(){
+                var  info_list = {content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"1",category:"14"}
                 var usage_input = document.getElementById('steam_usage_input').value
 
                 info_list.content = document.getElementById('carbon_emissions_content_filling').value
-                info_list.data =  usage_input+"ton"
+                info_list.data =  usage_input+"/"+"ton"
                 info_list.emissions = usage_input+4
-                info_list.StartDate = document.getElementById('start_data').value
+                info_list.StartDate = document.getElementById('start_data').value+'-01'
                 //info_list.EndDate = document.getElementById('end_data').value
                 
+                var plz = {
+                        "CarbonData": {
+                            "StartDate":document.getElementById('start_data').value+'-01',
+                            "EndDate":document.getElementById('start_data').value+'-01',
+                            "Location": "",
+                            "Scope":  Number(info_list.scope),
+                            "CarbonActivity": document.getElementById('carbon_emissions_content_filling').value,
+                            "CarbonUnit": unit_s,
+                            "usage": usage_input+"/"+unit_s,
+                            "Chief": null
+                        },
+                        "DetailType":"폐기물 처리시설 매립",
+                        //"RootCom":"samsung",
+                        //"BelongCom":"",
+                }
                 var table = computed(() => store.state.table_kind)
                 console.log("테이블 종류",table)
                 if(table.value == 'total_table'){
-                    store.commit("SetTotalTableContent",info_list);
-                    store.commit('DelTotalTableContent',selected.value);
+                    //수정 API 연결
+                    var config = {
+                        headers:{
+                            "Authorization":"Bearer"+" "+store.state.accessToken
+                        }
+                    }
+                   //console.log(selected.value[0])
+                   console.log(plz)
+                    await axios.put("/CarbonEmission/"+selected.value[0].id,plz,config).then(res => {
+                        console.log(plz)
+                        
+                    })
+                    .catch(error => {
+                        alert("다시 시도해주세요.")
+                        console.log(error)
+                        //router.push('/');
+                    })
+                    .finally(() => {
+                        console.log("lender1")
+                    })
                 }
                 else if(table.value == 'table'){
                     store.commit("SetTableContent",info_list);
                     store.commit('DelTableContent',selected.value);
                 }
                 store.commit("SetEditDelet");
+                location.reload();
             }
             
             function click_del_editPopup(){

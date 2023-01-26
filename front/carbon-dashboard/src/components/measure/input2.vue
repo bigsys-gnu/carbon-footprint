@@ -11,7 +11,7 @@
                     <button :class ="{category_select: SearchCategory ,'nonClick_category':SelectCategory}"  @click="clickSearch" id="search" >카테고리별 검색</button>
                     <button :class ="{category_select: SelectCategory, 'nonClick_category':SearchCategory }"  @click="clickSelect" id="select">카테고리명 선택</button><br>
                     <input :class ="{input_category: SearchCategory}" placeholder="카테고리를 검색하세요." v-if="SearchCategory==true"/> 
-                    <select :class ="{input_category: SelectCategory}"  v-model="selected_category" mutiple placeholder="카테고리명을 선택하세요." v-if="SelectCategory==true" id="option" >
+                    <select :class ="{input_category: SelectCategory}"  v-model="selected_category" mutiple placeholder="카테고리명을 선택하세요." v-if="SelectCategory==true" id="option" @change="clickCategory()">
                         <option v-for="category_name in category_option_list" :value="category_name.index">{{category_name.name}}</option>
                     </select>
                     <div :class="{info_text_category:SearchCategory}"  v-if="SearchCategory==true">카테고리를 선택해주세요.</div>
@@ -29,7 +29,7 @@
                 </div>
                 <!-- 추가 정보 입력하기 내용  -->
                 <div v-if="SelectCategory==true">
-                    <div :class="{add_regi_page: info_board_defalt}" v-if="info_board_defalt==false" >
+                    <div :class="{add_regi_page: info_board_defalt}" v-if="info_board_defalt==false && selected_category!=''" >
                         <div class="info_board" id="add_info"><br>
                             <!-- '구분'에서 카테고리별 상세 내용 -->
                             <power_usageVue class="power_usage_page" v-if = "selected_category==1"></power_usageVue>
@@ -220,11 +220,13 @@ import Waste_disposalWastewaterVue from './Divide-carbon/Waste_disposal(Wastewat
 import { computed , ref} from 'vue';
 import { useStore } from 'vuex'
 import axios from "axios";
+import { useRouter } from "vue-router";
 
     export default { 
         name :"input2",
         
         setup(){
+            const router = useRouter();
             const store = useStore()
             var SearchCategory = ref(true)
             var SelectCategory = ref(false)
@@ -261,6 +263,7 @@ import axios from "axios";
                 SelectCategory.value = true
             }
             function clickCategory(){
+                console.log("ddd")
                 //info_board_defalt.value = false
             }
             function clickInfoDrop(){
@@ -271,14 +274,11 @@ import axios from "axios";
                 console.log("등록되었습니다")
                 
                 var table = computed(()=> store.state.table)
-                
                 var config = {
                     headers:{
                     "Authorization":"Bearer"+" "+store.state.accessToken
-                    
                     }
                 }
-                
                 for(var row in table.value){
                     const data = (table.value[row])
                     console.log("row = "+JSON.stringify(data))
@@ -287,25 +287,26 @@ import axios from "axios";
                             "StartDate":(data.StartDate),
                             "EndDate":(data.EndDate),
                             "Location": "",
-                            "Scope":  1, //Number(data.scope), int 타입으로 수정해야함 
-                            "Category":10,
-                            "CarbonActivity": (data.content),
-                            "CarbonUnit": "string",
-                            "usage": 20, //carbon data
-                            "Chief": "jeong"
+                            "Scope":  (data.scope),
+                            "CarbonActivity": (data.CarbonActivity),
+                            "CarbonUnit": (data.unit),
+                            "usage": (data.data), //carbon data
+                            "Chief": "jeong",
+                            "Kind" :"",
+                            "Division":""
                         },
-                        "DetailType": "원유",//(data.data),
+                        "DetailType":store.state.CarbonCategories[Number(data.DetailType)],
                         //"RootCom":"samsung",
                         //"BelongCom":"",
-                        "Type":"고정연소"
+                        "Type":store.state.CarbonCategories[Number(data.category)]
                     }
                     console.log((input_data))
                     get_total_emission(input_data)
                 }
                 //{id:"",content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:""}
                 async function get_total_emission(input_data){
-                    await axios.post("/CarbonEmission/samsunglife",input_data,config).then(res => {
-                        console.log(JSON.stringify(input_data))
+                    await axios.post("/CarbonEmission/samsung",input_data,config).then(res => {
+                        console.log(JSON.stringify(input_data)) //carbon~/회사이름
                     })
                     .catch(error => {
                         console.log('send data'+JSON.stringify(input_data))
@@ -316,6 +317,7 @@ import axios from "axios";
                     })
                 }
                 store.commit('ResetTable')
+                //router.push({ path: 'input1' })
             }
             function click_cancle_table(){
                 store.commit('ResetTable')

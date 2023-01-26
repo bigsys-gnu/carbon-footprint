@@ -12,8 +12,8 @@
                 <textarea class="addInfo_input" id="carbon_emissions_content_animal" rows="8" style="height:12vh; width:25vw"></textarea>
                 </div> 
                 <div style="margin-top:30px; width:25vw">기간 설정<br>
-                    <input class = "date_btn" id = "start_data" type="date" data-placeholder="시작 날짜" required aria-required="true" style="margin-top:2vh; margin-left:0px; height:3.5vh">
-                    <input class = "date_btn" id = "end_data" type="date" style="margin-left:3vw; height:3.5vh">
+                    <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true" style="margin-top:2vh; margin-left:0px; height:3.5vh">
+                    <input class = "date_btn" id = "end_data" type="month" style="margin-left:3vw; height:3.5vh">
                 </div>
                 <div style="margin-top:30px; font-size:1.8vh">구분
                     <div class="add_info_divide" id="building_name_text" style="margin-top:4vh; width:25vw;">건물명 / 배출 시설명
@@ -26,7 +26,6 @@
                         <select class="addInfo_input" id="operating_entity_input" style="margin-left:58px; width:11.5vw; height:3.5vh">
                             <option  v-for="animal in animal_care_list" :aria-busy="animal">{{animal}}</option>
                         </select>
-                        
                     </div>
                     <div class="add_info_divide">가축 유형
                         <select class="addInfo_input" id="supplier_drop" style="margin-left:90px; width:11.5vw; height:3.5vh">
@@ -68,6 +67,7 @@
 <script>
 import { useStore } from "vuex"
 import {computed ,ref} from "vue"
+import axios from "axios";
 
     export default {
         name :"power_usage",
@@ -105,28 +105,63 @@ import {computed ,ref} from "vue"
                 '연료로 사용'
             ]
             //
-            function click_edit_btn(){
-                var info_list = {content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"Scope1", category:"8"}
+            async function click_edit_btn(){
+                var info_list = {content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"1", category:"5"}
 
                 var usage_input = document.getElementById('usage_input').value
                 info_list.content = document.getElementById('carbon_emissions_content_animal').value
-                info_list.data = document.getElementById('usage_input').value+"마리"
+                info_list.data = document.getElementById('usage_input').value+"/"+"마리"
                 info_list.emissions= usage_input+4
-                info_list.StartDate = document.getElementById('start_data').value
-                info_list.EndDate = document.getElementById('end_data').value
+                info_list.StartDate = document.getElementById('start_data').value+'-01'
+                info_list.EndDate = document.getElementById('end_data').value+'-01'
 
+                var plz = {
+                        "CarbonData": {
+                            "StartDate":document.getElementById('start_data').value+'-01',
+                            "EndDate":document.getElementById('end_data').value+'-01',
+                            "Location": "",
+                            "Scope":  Number(info_list.scope),
+                            "CarbonActivity": document.getElementById('carbon_emissions_content_animal').value,
+                            "CarbonUnit": "마리",
+                            "usage": usage_input+"/"+unit_s,
+                            "Chief": null
+                        },
+                        "DetailType":"대학동물",
+                        //"RootCom":"samsung",
+                        //"BelongCom":"",
+                }
                 var table = computed(() => store.state.table_kind)
                 console.log("테이블 종류",table.value)
                 if(table.value == 'total_table'){
-                    store.commit("SetTotalTableContent",info_list);
-                    store.commit('DelTotalTableContent',selected.value);
+                    var config = {
+                        headers:{
+                            "Authorization":"Bearer"+" "+store.state.accessToken
+                        }
+                    }
+                   //console.log(selected.value[0])
+                   console.log(plz)
+                    await axios.put("/CarbonEmission/"+selected.value[0].id,plz,config).then(res => {
+                        console.log(plz)
+                        
+                    })
+                    .catch(error => {
+                        alert("다시 시도해주세요.")
+                        console.log(error)
+                        //router.push('/');
+                    })
+                    .finally(() => {
+                        console.log("lender1")
+                    })
+                    
                 }
                 else if(table.value == 'table'){
                     store.commit("SetTableContent",info_list);
                     store.commit('DelTableContent',selected.value);
                 }
                 store.commit("SetEditDelet");
+                location.reload();//수정 API 연결
             }
+            
             
             function click_del_editPopup(){
                 console.log('수정창 닫기')

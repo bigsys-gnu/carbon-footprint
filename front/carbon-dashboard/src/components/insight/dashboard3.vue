@@ -5,9 +5,9 @@
             <span style="margin-left:4vw; color:#5A5A5A; font-weight: bolder; font-size:2.3vh;">{{year}}년 {{ month }}월</span>
         </div>
         <div class="dashboard" id="dashboard3_left">
-            <p class="dashboard3_left_scope">scope1</p>
-            <p class="dashboard3_left_scope">scope2</p>
-            <p class="dashboard3_left_scope">scope3</p>
+            <p class="dashboard3_left_scope" style="margin-top:3.4vh">scope1</p>
+            <p class="dashboard3_left_scope" style="margin-top:40vh">scope2</p>
+            <p class="dashboard3_left_scope" style="margin-top:23vh">scope3</p>
         </div>
         <div class="dashboard" id="dashboard3_right">
             <div style="padding:1vh">
@@ -20,7 +20,7 @@
         </div>
         <div class="dashboard" id="dashboard3_bottom">
             <span style="float:left; margin-left:8vw; color:#615B5B; font-weight: bolder;" >전체 </span>
-            <sapn style="color:#376B7C; margin-left:2vw; font-weight: bolder;">{{ total }}kg</sapn>
+            <sapn style="color:#376B7C; margin-left:2vw; font-weight: bolder;">{{ scope1+scope3+scope2 }}kg</sapn>
         </div>
     </div>
     
@@ -150,8 +150,9 @@ import { computed } from "vue";
         const store = useStore();
         var month = computed(() => store.state.insight_month+1);
         var year = computed(() => store.state.insight_year);
-        var total='1,241'
+        
         var datail_emission_arr = computed(() => store.state.detail_emission);
+        var total=10
         console.log(Object.values(datail_emission_arr.value[4]))
         var EmissionList =[
                 {iconSrc:require('@/assets/previewDetail/1.png'), label:"고정연소",weight:datail_emission_arr.value[0].고정연소},
@@ -173,6 +174,11 @@ import { computed } from "vue";
         var groupclick=false
         
         return{month,year,total,EmissionList,typeClick,groupclick}
+      },
+      props:{
+        scope1:Number,
+        scope2:Number,
+        scope3:Number
       },
       
   }

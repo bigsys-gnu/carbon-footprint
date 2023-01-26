@@ -19,5 +19,5 @@ let defaultoptions = {treeName:'blocks-tree'}
 app.use(VueBlocksTree,defaultoptions)
 
 app.use(store)
-app.use (router)
+app.use(router)
 app.mount('#app')

@@ -34,7 +34,7 @@
               <span class="date_info_btn" @click="click_back_month()"> ＜ </span>
               <span class="date_info">{{ year }}년 {{ month }}월</span>
               <span class="date_info_btn" @click="click_plus_month()"> ＞ </span><br>
-              <dashboard3Vue></dashboard3Vue>
+              <dashboard3Vue :scope1="scope1" :scope2="scope2" :scope3="scope3"></dashboard3Vue>
               <dashboard4Vue></dashboard4Vue>
               <Dashboard5></Dashboard5>
    
@@ -133,6 +133,7 @@ import { computed,ref } from "vue";
           var scope1 = ref(0)
           var scope2 = ref(0)
           var scope3 = ref(0)
+          var total_emission = ref(0)
           var datail_emission_arr = ref([])
           
           function click_month(){
@@ -155,19 +156,23 @@ import { computed,ref } from "vue";
             category_dashboard_year.value = false
           }
           function click_back_month(){
+            get_total_emission()
             store.commit("InsightAddM",-1);
           }
           function click_plus_month(){
+            get_total_emission()
             store.commit("InsightAddM",1);
           }
           function click_back_year(){
+            get_total_emission()
             store.commit("InsightAddY",1);
           }
           function click_plus_year(){
+            get_total_emission()
             store.commit("InsightAddY",1);
           }
-          const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjczMjM0OTM5LCJpYXQiOjE2NzMyMzQ2MzksImp0aSI6ImExMTQ1MWM5MDllMDQxZjBiM2ZmMmVkNGFjOTFlNDA3IiwidXNlcl9pZCI6IjEyM0BnbWFpbC5jb20ifQ.FZ5DWparBFsV7zKJjOpWiEbY1IqiTwvUPRMKjs60pw4"
-          console.log("토큰"+token)
+          
+          
           var config = {
             headers:{
               "Authorization":"Bearer"+" "+store.state.accessToken,
@@ -175,12 +180,13 @@ import { computed,ref } from "vue";
             }
           }
           async function get_total_emission(){
-              await axios.get("Company/Preview/samsung/2023-0"+month.value+"-01/2023-0"+month.value+"-31",config).then(res => {
+              await axios.get("Company/Preview/samsung/"+year.value+"-"+month.value+"-01/"+year.value+"-"+month.value+"-28",config).then(res => {
                     console.log(res.data)
-                    console.log("dawdawdawdadawdawdaw")
+                    console.log("연월"+year.value+month.value)
                     this.scope1 = res.data.Scopes[0]
                     this.scope2 = res.data.Scopes[1]
                     this.scope3 = res.data.Scopes[2]
+                    total_emission  = res.data.Scopes.reduce((a, b) => a + b, 0)
                     store.commit("SetDetailEmission",res.data.EmissionList);
                 })
                 .catch(error => {

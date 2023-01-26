@@ -103,12 +103,60 @@ export default {
         for(let key in selected_id.value){
           del_carbon_data(selected_id.value[key].id)
         }
-        
+        location.reload();
         
       }
+      
+      function click_copy_btn(){
+                console.log("복사",selected_id.value)
+                var config = {
+                    headers:{
+                    "Authorization":"Bearer"+" "+store.state.accessToken
+                    }
+                }
+                for(var row in selected_id.value){
+                    const data = (selected_id.value[row])
+                    console.log("row = "+JSON.stringify(data))
+                    var input_data = {
+                        "CarbonData": {
+                            "StartDate":(data.StartDate),
+                            "EndDate":(data.EndDate),
+                            "Location": "",
+                            "Scope":  1, //Number(data.scope), int 타입으로 수정해야함 
+                            "Category":10,
+                            "CarbonActivity": (data.content),
+                            "CarbonUnit": (data.unit),
+                            "usage": (data.data), //carbon data
+                            "Chief": "jeong"
+                        },
+                        "DetailType":store.state.CarbonCategories[Number(data.category)],
+                        //"RootCom":"samsung",
+                        //"BelongCom":"",
+                        "Type":store.state.CarbonCategories[Number(data.category)]
+                    }
+                    console.log((input_data))
+                    get_total_emission(input_data)
+                }
+                //{id:"",content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:""}
+                async function get_total_emission(input_data){
+                    await axios.post("/CarbonEmission/samsung",input_data,config).then(res => {
+                        console.log(JSON.stringify(input_data))
+                    })
+                    .catch(error => {
+                        console.log('send data'+JSON.stringify(input_data))
+                        console.log(error)
+                        
+                    })
+                    .finally(() => {
+                    })
+                }
+                store.commit('ResetTable')
+                location.reload();
+            }
 
       function click_edit_btn(){
         if(selected_id.value.length == 1){
+          console.log(JSON.stringify(selected_id.value)+"에딧 버튼")
           store.commit('SetTableKind','total_table')
           store.commit('SetEditOpen',selected_id.value)
         } 
@@ -122,20 +170,22 @@ export default {
               Authorization:"Bearer"+" "+store.state.accessToken,
               "Content-Type": "text/html; charset=utf-8",
             }
-          }
+      }
       async function get_data(){
         await axios.get("/CarbonEmission/samsung",config).then(res => {
               console.log(res.data)
               
               for(var i=0;i<res.data.length;i++){
-                var info_list={id:"",content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:""}
+                var info_list={id:"",content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"", category:""}
                 info_list.id = res.data[i].id
                 info_list.content = res.data[i].CarbonActivity
-                info_list.data =  res.data[i].CarbonData
-                info_list.emissions = res.data[i].CarbonTrans
+                info_list.data =  res.data[i].CarbonData + "kg"
+                info_list.emissions = res.data[i].CarbonTrans + res.data[i].CarbonUnit
                 info_list.StartDate = res.data[i].CarbonInfo.StartDate   //api추가되면 수정 
                 info_list.EndDate = res.data[i].CarbonInfo.EndDate 
                 info_list.scope = res.data[i].CarbonInfo.Scope 
+                console.log(res.data[i].CarbonInfo.Category )
+                info_list.category = res.data[i].CarbonInfo.Category 
                 rows.value.unshift(info_list)
               }     
           })
@@ -167,6 +217,7 @@ export default {
         click_del_btn,
         selectionChanged,
         click_edit_btn,
+        click_copy_btn,
         get_data,
         del_carbon_data
       }

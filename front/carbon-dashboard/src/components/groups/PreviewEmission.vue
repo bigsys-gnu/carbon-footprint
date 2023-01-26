@@ -15,9 +15,9 @@
         <progress class="preview-TotalEmission-ratio" value="100" max="100"></progress>
         
         <div style="margin-top:4vh">{{scope12CarbonEmission}}kg</div>
-        <progress class="preview-scope-ratio" value="40" max="100"></progress>
+        <progress class="preview-scope-ratio" :value="scope12CarbonEmission" :max="scope12CarbonEmission+scope3CarbonEmission"></progress>
         <div>{{scope3CarbonEmission}}kg</div>
-        <progress class="preview-scope-ratio" value="60" max="100"></progress>
+        <progress class="preview-scope-ratio" :value="scope3CarbonEmission" :max="scope12CarbonEmission+scope3CarbonEmission"></progress>
     </div>        
 
     <div class="preview-move-button">
@@ -140,7 +140,7 @@ progress::-webkit-progress-value {
 </style>
 
 <script>
-import { computed } from "vue";
+import { computed,ref } from "vue";
 import { useStore } from "vuex";
 import axios from "axios";
 export default{ 
@@ -159,8 +159,8 @@ export default{
         const OnInfoPreview = () => store.commit("OnGroupPreview", "info");
 
         const GroupName = "samsung";
-        var scope12CarbonEmission = 1;
-        var scope3CarbonEmission = 7;
+        var scope12CarbonEmission = ref(1);
+        var scope3CarbonEmission = ref(7);
         var month = computed(() => store.state.insight_month+1);
         var config = {
             headers:{
@@ -170,8 +170,8 @@ export default{
         }
         async function get_total_emission(){
             await axios.get("Company/Preview/samsung/2023-0"+month.value+"-01/2023-0"+month.value+"-31",config).then(res => {
-                scope12CarbonEmission = res.data.Scopes[0]+res.data.Scopes[1]
-                scope3CarbonEmission = res.data.Scopes[2]
+                scope12CarbonEmission.value = res.data.Scopes[0]+res.data.Scopes[1]
+                scope3CarbonEmission.value = res.data.Scopes[2]
             })
             .catch(error => {
                 
@@ -183,7 +183,7 @@ export default{
         }
         
 
-        var TotalEmission = scope3CarbonEmission + scope12CarbonEmission;
+        var TotalEmission = scope3CarbonEmission.value + scope12CarbonEmission.value;
 
         return{Offpreview,GroupName,TotalEmission,scope12CarbonEmission,scope3CarbonEmission,
             OnTotalPreview,OnDetailPreview,OnInfoPreview,get_total_emission}

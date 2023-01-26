@@ -6,8 +6,8 @@
             <input type="text" class="addInfo_input" id="carbon_emissions_content">
         </div> 
         <div style="margin-top:30px">기간 설정
-            <input class = "date_btn" id = "start_data" type="date" data-placeholder="시작 날짜" required aria-required="true">
-            <input class = "date_btn" id = "end_data" type="date">
+            <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true">
+            <input class = "date_btn" id = "end_data" type="month">
         </div>
         <div class="add_info_divide" id="building_name_text" style="margin-top:4vh">건물명 / 배출 시설명
             <input type="text" class="addInfo_input" id ="building_name_input" placeholder="경상대 본관">

@@ -3,7 +3,14 @@
         <div class="dash_title" >총 탄소 배출량 대비 Scope 비율</div>
         <div class="dashboard" id="dashboard1_scope">
             <div style="width:20vw; background-color:aquamarine; position:relative;">
-                <chart4  style="height:12vh; width: 18vw; position:absolute;" :data="[2,3,4]"></chart4>
+              <Suspense>
+                <template #default>
+                  <chart4  style="height:12vh; width: 18vw; position:absolute;"  ></chart4>
+                </template>
+                <template #fallback>
+                  <div>Loading...</div>
+                </template>
+              </Suspense>
             </div>
             <div style="float:right; margin-top:0.7vh;">
                 <div class="scope_emission">{{ scope1 }}kt</div>
@@ -33,6 +40,7 @@
 
 <script>
 import chart4 from './chart1';
+import { computed,ref } from "vue";
   export default {
       name :"dashboard1",
       components:{
@@ -43,7 +51,12 @@ import chart4 from './chart1';
             total_emssion: '1,241'
         }
       },
-      setup(){},
+      setup(){
+        
+        return{
+            
+        }
+      },
       props:{
         scope1:Number,
         scope2:Number,

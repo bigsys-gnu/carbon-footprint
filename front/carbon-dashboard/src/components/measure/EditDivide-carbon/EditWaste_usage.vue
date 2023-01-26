@@ -12,8 +12,8 @@
                 <textarea class="addInfo_input" id="carbon_emissions_content_waste" rows="8" style="height:12vh; width:25vw"></textarea>
                 </div> 
                 <div style="margin-top:30px; width:25vw">기간 설정<br>
-                    <input class = "date_btn" id = "start_data" type="date" data-placeholder="시작 날짜" required aria-required="true" style="margin-top:2vh; margin-left:0px; height:3.5vh">
-                    <input class = "date_btn" id = "end_data" type="date" style="margin-left:3vw; height:3.5vh">
+                    <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true" style="margin-top:2vh; margin-left:0px; height:3.5vh">
+                    <input class = "date_btn" id = "end_data" type="month" style="margin-left:3vw; height:3.5vh">
                 </div>
                 <div style="margin-top:30px; font-size:1.8vh">구분
                     <div class="add_info_divide" id="building_name_text" style="margin-top:4vh; width:25vw;">건물명 / 배출 시설명
@@ -111,7 +111,7 @@
 <script>
 import {useStore} from 'vuex'
 import {ref, computed} from 'vue'
-
+import axios from "axios";
     export default {
         name :"waste_usage",
         setup(){
@@ -121,26 +121,58 @@ import {ref, computed} from 'vue'
             var main_agent = ref('기업')     
             var selected = computed(()=>store.state.selected_row);
 
-            function click_edit_btn(){
-                var info_list = {content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"Scope1",category:"3"}
+            async function click_edit_btn(){
+                var info_list = {content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"1",category:"10"}
                 var usage_input = document.getElementById('emissions').value
                 info_list.content = document.getElementById('carbon_emissions_content_waste').value
-                info_list.data =  usage_input+"ton"
+                info_list.data =  usage_input+"/"+"ton"
                 info_list.emissions = usage_input+4
-                info_list.StartDate = document.getElementById('start_data').value
-                info_list.EndDate = document.getElementById('end_data').value
+                info_list.StartDate = document.getElementById('start_data').value+'-01'
+                info_list.EndDate = document.getElementById('end_data').value+'-01'
                 if(main_agent.value == '기업'){
-                    info_list.scope = 'Scope1'
+                    info_list.scope = '1'
                 }
                 else if(main_agent.value == "민간"){
-                    info_list.scope = 'Scope2'
+                    info_list.scope = '2'
                 }
-                
+                var plz = {
+                        "CarbonData": {
+                            "StartDate":document.getElementById('start_data').value+'-01',
+                            "EndDate":document.getElementById('end_data').value+'-01',
+                            "Location": "",
+                            "Scope":  Number(info_list.scope),
+                            "CarbonActivity": document.getElementById('carbon_emissions_content_waste').value,
+                            "CarbonUnit": unit_s,
+                            "usage": usage_input+"/"+unit_s,
+                            "Chief": null
+                        },
+                        "DetailType":"열",
+                        //"RootCom":"samsung",
+                        //"BelongCom":"",
+                }
                 var table = computed(() => store.state.table_kind)
                 console.log("테이블 종류",table.value)
                 if(table.value == 'total_table'){
-                    store.commit("SetTotalTableContent",info_list);
-                    store.commit('DelTotalTableContent',selected.value);
+                    //수정 API 연결
+                    var config = {
+                        headers:{
+                            "Authorization":"Bearer"+" "+store.state.accessToken
+                        }
+                    }
+                   //console.log(selected.value[0])
+                   console.log(plz)
+                    await axios.put("/CarbonEmission/"+selected.value[0].id,plz,config).then(res => {
+                        console.log(plz)
+                        
+                    })
+                    .catch(error => {
+                        alert("다시 시도해주세요.")
+                        console.log(error)
+                        //router.push('/');
+                    })
+                    .finally(() => {
+                        console.log("lender1")
+                    })
                 }
                 else if(table.value == 'table'){
                     store.commit("SetTableContent",info_list);

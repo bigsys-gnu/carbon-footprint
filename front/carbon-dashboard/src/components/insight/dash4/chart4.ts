@@ -1,7 +1,7 @@
-import { defineComponent, h, PropType } from 'vue'
+import { defineComponent,computed, h, PropType } from 'vue'
 
 import { Bar } from 'vue-chartjs'
-
+import { useStore } from "vuex";
 import {
   Chart as ChartJS,
   Title,
@@ -49,6 +49,20 @@ export default defineComponent({
     
   },
   setup(props) {
+    const store = useStore();
+    //타입 에러 수정 
+    // var detail_emission = computed(() => store.state.detail_emission);
+    // console.log(JSON.stringify(detail_emission.value)+"디테일")
+
+
+    // // 순위에 따라 정렬
+    // let sorted = (detail_emission.value).sort((a, b) => b[1] - a[1]);
+    // var sortable : string[] = [];
+    // for (var order in detail_emission.value) {
+    //   sortable.push([order, detail_emission.value[order]]);
+    // }
+    // console.log(JSON.stringify(sorted)+"디테일2")  
+    
     const chartData = {
       labels: [
         '고정연소','이동연소','탈루배출','폐기물 처리시설','비료사용','폐기물','대학 동물 사육','산림에 의한 흡수','전력'

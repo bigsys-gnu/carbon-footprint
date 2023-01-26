@@ -1,22 +1,22 @@
 <template>
   <div>
-    <div class="addGroup_treelist">
+    <!-- <div class="addGroup_treelist">
       <span class="addGroup_tree_text">전체</span> <span class="addGroup_tree_text" style="color:#3DC984">{{ num }}</span>
       <button class="addGroup_tree_btnAdd"  @click="addNode()">+　추가하기</button>
-    </div>
+    </div> -->
     <Tree style="color:black; font-size:2vh;margin-top:5vh"
     :nodes="data"
     :use-icon="true"
-    :use-checkbox="true"
+    
     :use-expandable="true"
-    use-row-delete
+  
     @nodeClick="onNodeClick"
     />
-    <div class="addGroup_initInput">
+    <!-- <div class="addGroup_initInput">
       <input class="addGroup_initInput_check" type="checkbox"/>
       <input @keyup.enter="addNode(group_name)" v-model="group_name" class="addGroup_initInput_input" placeholder="조직이름을 설정해주세요"/>
       <button class="addGroup_initInput_enter" @click="addNode(group_name)">↲　입력</button>
-    </div>
+    </div> -->
     
   </div>
   
@@ -72,7 +72,6 @@
 import { ref } from "vue";
 import Tree from "vue3-tree";
 import "vue3-tree/dist/style.css";
-
 export default {
   components: {
     Tree,
@@ -141,6 +140,8 @@ export default {
       data.value.push(list)
       console.log(data.value)
     }
+    
+  
     return {
       data,
       searchText,
@@ -151,6 +152,7 @@ export default {
       closeEnter,
       addNode,
       num,
+   
     };
   },
 };

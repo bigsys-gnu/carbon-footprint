@@ -9,8 +9,8 @@
         <input type="text" class="addInfo_input" id="carbon_emissions_content">
     </div> 
     <div style="margin-top:30px">기간 설정
-        <input class = "date_btn" id = "start_data" type="date" data-placeholder="시작 날짜" required aria-required="true">
-        <input class = "date_btn" id = "end_data" type="date">
+        <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true">
+        <input class = "date_btn" id = "end_data" type="month">
     </div>
     <div style="margin-top:4vh">구분</div>
     <div class="add_info_divide" style="margin-top:0vh">차량분류
@@ -70,18 +70,18 @@ import {ref,computed} from "vue"
                 {name: 'LNG', unit:'Nm^3'},
             ]
             function click_regi_btn(unit_s){
-                var info_list={content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"Scope1",category:"5"}
+                var info_list={content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:1 , category:"1" ,unit:unit_s}
                 var usage_input = document.getElementById('amount_fuel').value
                 info_list.content = document.getElementById('carbon_emissions_content').value
-                info_list.data =  usage_input+unit_s
+                info_list.data =  usage_input+"/"+unit_s
                 info_list.emissions = usage_input+4
-                info_list.StartDate = document.getElementById('start_data').value
-                info_list.EndDate = document.getElementById('end_data').value
+                info_list.StartDate = document.getElementById('start_data').value+'-01'
+                info_list.EndDate = document.getElementById('end_data').value+'-01'
                 if(main_agent.value == '기업'){
-                    info_list.scope = 'Scope1'
+                    info_list.scope = 1
                 }
                 else if(main_agent.value == "민간"){
-                    info_list.scope = 'Scope2'
+                    info_list.scope = 2
                 }
                 store.commit("SetTableContent",info_list)
             }

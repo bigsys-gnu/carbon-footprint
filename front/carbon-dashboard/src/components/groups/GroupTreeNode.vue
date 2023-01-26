@@ -5,17 +5,17 @@
         </div>
         <div class="group-tree-node-mid">
             <span class="group-tree-node-totalEmission-left">전체 탄소 배출량 </span>
-            <span class="group-tree-node-totalEmission-right"> {{ scope12CarbonEmission+scope3CarbonEmission}} kg</span>
+            <span class="group-tree-node-totalEmission-right"> {{ Scope1+Scope2+Scope3}} kg</span>
             <div class="group-tree-node-emission-graph12">           
                 <span style="color: #4F4F4F; font-size: 1.5vh; ">scope1,2</span>
-                <span style="color: #5A6A89; font-size: 1.4vh; font-weight: 600;">{{scope12CarbonEmission}}kg</span>
+                <span style="color: #5A6A89; font-size: 1.4vh; font-weight: 600;">{{Scope1+Scope2}}kg</span>
             </div>
-            <progress value="0.4" class="progress_bar">dasdas</progress>
+            <progress :value="Scope1+Scope2" :max="Scope1+Scope2+Scope3" class="progress_bar">dasdas</progress>
             <div class="group-tree-node-emission-graph3">
                 <span style="color: #4F4F4F; font-size: 1.5vh;">scope3</span>
-                <span style="color: #5A6A89; font-size: 1.4vh; font-weight: 600;">{{scope3CarbonEmission}}kg</span>
+                <span style="color: #5A6A89; font-size: 1.4vh; font-weight: 600;">{{Scope3}}kg</span>
             </div>
-            <progress value="0.6" class="progress_bar">dasdas</progress>
+            <progress :value="Scope3" :max="Scope1+Scope2+Scope3" class="progress_bar">dasdas</progress>
         </div>
         <div class="group-tree-node-bottom">
             <span class="group-tree-node-manager">담당자</span>
@@ -138,8 +138,9 @@ export default{
     props:{
         level:Number,
         GroupName:String,
-        scope12CarbonEmission:Number,
-        scope3CarbonEmission:Number,
+        Scope1:Number,
+        Scope2:Number,
+        Scope3:Number,
         manager:String
     },
     setup(props){

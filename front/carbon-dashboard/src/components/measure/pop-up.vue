@@ -1,20 +1,20 @@
 <template>
     <div class="active">
-        <EditPower_usage class="edit-category-popup"></EditPower_usage>
-        <EditSteam_usage class="edit-category-popup" v-if="category == '1'"></EditSteam_usage>
-        <EditWater_usage class="edit-category-popup" v-else-if="category == '2'"></EditWater_usage>
-        <EditWaste_usage class="edit-category-popup" v-else-if="category == '3'"></EditWaste_usage>
-        <EditStationary class="edit-category-popup" v-else-if="category == '4'"></EditStationary>
-        <EditMobile class="edit-category-popup" v-else-if="category == '5'"></EditMobile>
-        <EditFugitive class="edit-category-popup" v-else-if="category == '6'"></EditFugitive>
-        <EditFertilizer class="edit-category-popup" v-else-if="category == '7'"></EditFertilizer>
-        <EditAnimal_possession class="edit-category-popup" v-else-if="this.category == '8'"></EditAnimal_possession>
-        <EditForest_absorption class="edit-category-popup" v-else-if="this.category == '9'"></EditForest_absorption>
-        <EditWaste_filling class="edit-category-popup" v-else-if="this.category == '10'"></EditWaste_filling>
-        <EditWaste_incineration class="edit-category-popup" v-else-if="this.category == '11'"></EditWaste_incineration>
-        <EditWaste_sewage class="edit-category-popup" v-else-if="this.category == '12'"></EditWaste_sewage>
-        <EditWaste_biological class="edit-category-popup" v-else-if="this.category == '13'"></EditWaste_biological>
-        <EditWaste_wastewater class="edit-category-popup" v-else-if="this.category == '14'"></EditWaste_wastewater>
+        <EditPower_usage class="edit-category-popup"  v-if="category == '7'"></EditPower_usage>
+        <EditSteam_usage class="edit-category-popup" v-if="category == '8'"></EditSteam_usage>
+        <EditWater_usage class="edit-category-popup" v-else-if="category == '9'"></EditWater_usage>
+        <EditWaste_usage class="edit-category-popup" v-else-if="category == '10'"></EditWaste_usage>
+        <EditStationary class="edit-category-popup" v-else-if="category == '0'"></EditStationary>
+        <EditMobile class="edit-category-popup" v-else-if="category == '1'"></EditMobile>
+        <EditFugitive class="edit-category-popup" v-else-if="category == '2'"></EditFugitive>
+        <EditFertilizer class="edit-category-popup" v-else-if="category == '4'"></EditFertilizer>
+        <EditAnimal_possession class="edit-category-popup" v-else-if="this.category == '5'"></EditAnimal_possession>
+        <EditForest_absorption class="edit-category-popup" v-else-if="this.category == '6'"></EditForest_absorption>
+        <EditWaste_filling class="edit-category-popup" v-else-if="this.category == '14'"></EditWaste_filling>
+        <EditWaste_incineration class="edit-category-popup" v-else-if="this.category == '15'"></EditWaste_incineration>
+        <EditWaste_sewage class="edit-category-popup" v-else-if="this.category == '16'"></EditWaste_sewage>
+        <EditWaste_biological class="edit-category-popup" v-else-if="this.category == '17'"></EditWaste_biological>
+        <EditWaste_wastewater class="edit-category-popup" v-else-if="this.category == '18'"></EditWaste_wastewater>
     </div>
 </template>
 
