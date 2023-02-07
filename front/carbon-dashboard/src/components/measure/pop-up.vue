@@ -41,7 +41,7 @@ import {ref,computed} from 'vue'
 export default {
     setup(){
         const store = useStore()
-        var category = computed(() => store.state.selected_row[0].category)
+        var category = computed(() => store.state.selected_row[0].Type)
 
         return{
             category

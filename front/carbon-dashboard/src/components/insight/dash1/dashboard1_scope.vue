@@ -5,7 +5,7 @@
             <div style="width:20vw; background-color:aquamarine; position:relative;">
               <Suspense>
                 <template #default>
-                  <chart4  style="height:12vh; width: 18vw; position:absolute;"  ></chart4>
+                  <chart4 :key="scope1" style="height:12vh; width: 18vw; position:absolute;"  ></chart4>
                 </template>
                 <template #fallback>
                   <div>Loading...</div>
@@ -48,7 +48,7 @@ import { computed,ref } from "vue";
       },
       data() {
         return{
-            total_emssion: '1,241'
+            total_emssion: '1,241',
         }
       },
       setup(){
@@ -61,6 +61,8 @@ import { computed,ref } from "vue";
         scope1:Number,
         scope2:Number,
         scope3:Number
+      },
+      created(){
       }
   }
 </script>

@@ -6,7 +6,7 @@
     </div>
     <div style="margin-top:50px; ">
         탄소 배출 내용<br>
-        <input type="text" class="addInfo_input" id="carbon_emissions_content">
+        <input type="text" class="addInfo_input" id="carbon_emissions_content_station">
     </div> 
     <div style="margin-top:30px">기간 설정
         <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true">
@@ -24,8 +24,8 @@
         
     </div>
     <div class="add_info_divide">연료정보
-        <select v-model="unit_s" class="addInfo_input" id="fuel_info">
-            <option v-for = "fule in fule_info_list" :value="fule.unit">{{fule.name}}</option>
+        <select v-model="index" class="addInfo_input" id="fuel_info">
+            <option v-for = "fule in fule_info_list" :value="fule.index">{{fule.name}}</option>
         </select>
     </div>
     <div class="add_info_divide" >연료량
@@ -82,17 +82,19 @@
 <script>
 import {useStore} from 'vuex'
 import {ref, computed} from 'vue'
+import { isTSAnyKeyword } from '@babel/types'
     export default {
         name :"stationary_combustion",
         setup(){
             const store = useStore()
-            var unit_s = ref('kg')
+            var index = ref('1')
+           
             var main_agent = ref('기업')
-            var fule_info_list = ref([
+            var fule_info_list =[
                     {index:1, name: '원유', unit:'kg'},
                     {index:2, name: '휘발유' ,unit:'L'},
-                    {index:3, name: '실내 등유' ,unit:'L'},
-                    {index:4, name: '보일러 등유' ,unit:'L'},
+                    {index:3, name: '실내등유' ,unit:'L'},
+                    {index:4, name: '보일러등유' ,unit:'L'},
                     {index:5, name: '경유' ,unit:'L'},
                     {index:6, name: 'B-A유' ,unit:'L'},
                     {index:7, name: 'B-B유' ,unit:'L'},
@@ -105,8 +107,8 @@ import {ref, computed} from 'vue'
                     {index:14, name: '아스팔트',unit:'kg'},
                     {index:15, name: '윤활유',unit:'L'},
                     {index:16, name: '석유코크',unit:'kg'},
-                    {index:17, name: '부생연료 1호',unit:'L'},
-                    {index:18, name: '부생연료 2호',unit:'L'},
+                    {index:17, name: '부생연료1호',unit:'L'},
+                    {index:18, name: '부생연료2호',unit:'L'},
                     {index:19, name: '천연가스(LNG)',unit:'kg'},
                     {index:20, name: '도시가스(LNG)',unit:'Nm^3'},
                     {index:21, name: '도시가스(LPG)',unit:'Nm^3'},
@@ -116,28 +118,43 @@ import {ref, computed} from 'vue'
                     {index:25, name: '유연탄(연료용)',unit:'kg'},
                     {index:26, name: '아역청탄',unit:'kg'},
                     {index:27, name: '코크스',unit:'kg'},
-                    {index:28, name: '전기(발전기준)',unit:'kWh'},
-                    {index:29, name: '전기(소비기준)',unit:'kWh'},
-                    {index:30, name: '신탄',unit:'kWh'},
-                ])
+                ]
+                var unit_s =fule_info_list[index.value-1].unit
                 function click_regi_btn(unit_s){
-                    var info_list = {content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:1,category:"0",unit:unit_s}
+                    var info_list={
+                        Type:"0",
+                        DetailType:"",
+                        StartDate:"",
+                        EndDate:"",
+                        Location:"",
+                        scope:1,
+                        data:"",
+                        emissions:"",
+                        Carbonunit:unit_s,
+                        CarbonActivity:"",
+                        kind:"",
+                        Division:{건물명:"", 설비명:""},
+                    }
+                
                     var usage_input = document.getElementById('amount_fuel').value
-                    info_list.content = document.getElementById('carbon_emissions_content').value
+                    info_list.CarbonActivity = document.getElementById('carbon_emissions_content_station').value
                     info_list.data =  usage_input+"/"+unit_s
                     info_list.emissions = usage_input+4
                     info_list.StartDate = document.getElementById('start_data').value+'-01'
                     info_list.EndDate = document.getElementById('end_data').value+'-01'
+                    info_list.Division.건물명 = document.getElementById('building_name_text').value
+                    info_list.Division.설비명 = document.getElementById('facility_name_input').value
                     if(main_agent.value == '기업'){
                         info_list.scope = 1
                     }
                     else if(main_agent.value == "민간"){
                         info_list.scope =2
                     }
+                    info_list.DetailType = fule_info_list[index.value-1].name
                     store.commit("SetTableContent",info_list)
-                    
                 }
                 return{
+                    index,
                     unit_s,
                     main_agent,
                     fule_info_list,

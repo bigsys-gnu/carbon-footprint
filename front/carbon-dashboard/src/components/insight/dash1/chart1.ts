@@ -88,24 +88,15 @@ export default defineComponent({
         "Content-Type": "text/html; charset=utf-8",
       }
     }
-    async function get_list(){
-      await axios.get("/Company/Preview/samsung/2023-"+month.value+"-01/2023-"+month.value+"-28",config).then(res => {
-        //모든 scope가 0이면 그래프가 그려지지 않으므로 디폴트 값 지정 
-        if(!res.data.Scopes.reduce((a, b) => a + b, 0)){
-          chartData.datasets[0].data = [1,1,3]
-        }else{
-          chartData.datasets[0].data =res.data.Scopes
-        }
-        
-        return res.data.Scopes[0]
-      })
-      .catch(error => {
-          console.log(error)
-          router.push('/');
-      })
-      .finally(() => {
-        
-      })
+    async function get_list(){  //prop으로 대체하기\
+      var data = computed(() =>store.state.scopes).value
+      if((data.reduce((a, b) => a + b, 0))!=0 ){
+        chartData.datasets[0].data = data
+      }else{
+        chartData.datasets[0].data = [2,1.4,1]
+      }
+      
+      console.log("리렌ㅌ도ㅓ")
     }
     await get_list()
     return () =>

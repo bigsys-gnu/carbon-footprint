@@ -28,7 +28,7 @@
       },
       data() {
         return{
-            total_emssion: '1,241'
+            total_emssion: '1,241',
         }
       },
       props:{

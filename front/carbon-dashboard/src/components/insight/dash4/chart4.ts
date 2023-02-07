@@ -31,7 +31,7 @@ export default defineComponent({
     },
     height: {
       type: Number,
-      default: 600
+      default: 1000
     },
     cssClasses: {
       default: '',
@@ -49,21 +49,8 @@ export default defineComponent({
     
   },
   setup(props) {
-    const store = useStore();
-    //타입 에러 수정 
-    // var detail_emission = computed(() => store.state.detail_emission);
-    // console.log(JSON.stringify(detail_emission.value)+"디테일")
 
-
-    // // 순위에 따라 정렬
-    // let sorted = (detail_emission.value).sort((a, b) => b[1] - a[1]);
-    // var sortable : string[] = [];
-    // for (var order in detail_emission.value) {
-    //   sortable.push([order, detail_emission.value[order]]);
-    // }
-    // console.log(JSON.stringify(sorted)+"디테일2")  
-    
-    const chartData = {
+    var chartData = {
       labels: [
         '고정연소','이동연소','탈루배출','폐기물 처리시설','비료사용','폐기물','대학 동물 사육','산림에 의한 흡수','전력'
         
@@ -74,7 +61,7 @@ export default defineComponent({
           borderRadius:20,
           backgroundColor: ['#15575C','#62BC8A','#A0A0A0','#C7C5C5','#EAE7E7','#F1F1F1','#F1F1F1','#F1F1F1','#F1F1F1','#F1F1F1',],
           data: [142,132,120,100,75,60,42,30,20],
-          barThickness: 20,
+          barThickness: 10,
           padding:4,
         },
       ],
@@ -105,6 +92,49 @@ export default defineComponent({
       },
       indexAxis:'y' as const,
     }
+
+
+    const store = useStore();
+
+    //배출량 순서대로 정렬 
+    const detail_emission_lable = computed(() => store.state.CarbonCategories).value;
+    var detail_emission_value = computed(() => store.state.detail_emission).value;
+
+    var new_arr = [[0,""]] //타입 지정 
+
+    console.log(typeof(new_arr))
+    for(var label in detail_emission_lable){
+      var key = JSON.stringify(Object.keys(detail_emission_value[label])[0])
+      var value = JSON.stringify(Object.values(detail_emission_value[label])[0])
+      new_arr.push([Number(value),key.replace(/\"/g,"")])
+    }
+    new_arr.shift()
+    
+    console.log(new_arr)
+    console.log(typeof(new_arr[1][1]))
+    new_arr.sort(sortFunction)
+
+    function sortFunction(a, b) {
+      if (a[0] === b[0]) {
+          return 0;
+      }
+      else {
+          return (a[0] > b[0]) ? -1 : 1;
+      }
+    }
+    for( let i = 0; i < new_arr[0].length ; i++){
+      const tmp = Array();
+         // 2. 배열의 행에서 선택한 열의 값을 추출
+         new_arr.forEach( (row, idx) => tmp.push(row[i]));
+        // 3. 추출한 값을 저장
+        new_arr.push(tmp);
+    }
+    new_arr[20].pop()
+    console.log(typeof(new_arr[20]))
+
+    chartData.labels = new_arr[20].map(String)
+
+    chartData.datasets[0].data = new_arr[19].map(Number)
 
     return () =>
       h(Bar, {

@@ -29,7 +29,7 @@
     </div>
     <div class="dashboard" id="dashboard5_bottom"> 
       <span style="float:left; margin-left:6vw; color:#615B5B; font-weight: bolder;" >총 에너지 소비량 </span>
-      <sapn style="color:#376B7C; margin-left:-1.5vw; font-weight: bolder;">{{ total }}kg</sapn>
+      <span style="color:#376B7C; margin-left:-1.5vw; font-weight: bolder;">{{ total }}kg</span>
     </div>
   </div>
     

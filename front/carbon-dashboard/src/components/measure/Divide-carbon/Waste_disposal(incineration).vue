@@ -6,7 +6,7 @@
     </div>
     <div style="margin-top:50px; ">
         탄소 배출 내용<br>
-        <input type="text" class="addInfo_input" id="carbon_emissions_content">
+        <input type="text" class="addInfo_input" id="carbon_emissions_content_incineration">
     </div> 
     <div class="add_info_divide" id="building_name_text" style="margin-top:4vh">시설명/위치
         <input type="text" class="addInfo_input" id ="building_name_input" placeholder="성남시" style="margin-left:95px;">
@@ -23,22 +23,22 @@
         </select>
     </div>
     <div class="add_info_divide">폐기물 세부 구분
-        <select class="addInfo_input" id="supplier_drop" v-if="kindOfwaste == '0'" style="margin-left:62px">
-            <option v-for = "waste in waste_life_list" >{{waste}}</option>
+        <select v-model="waste" class="addInfo_input" id="supplier_drop" v-if="kindOfwaste == '0'" style="margin-left:62px">
+            <option v-for = "waste_ in waste_life_list" :value = waste_ >{{waste_}}</option>
         </select>
-        <select class="addInfo_input" id="supplier_drop" v-else-if="kindOfwaste == '1'" style="margin-left:62px">
-            <option v-for = "waste in waste_corpor_list" >{{waste}}</option>
+        <select v-model="waste" class="addInfo_input" id="supplier_drop" v-else-if="kindOfwaste == '1'" style="margin-left:62px">
+            <option v-for = "waste_ in waste_corpor_list" :value = waste_>{{waste_}}</option>
         </select>
     </div>
     <div class="add_info_divide">소각 기술
-        <select class="addInfo_input" id="supplier_drop_steam" style="margin-left:108px">
-            <option value="0">연속식 -고정상</option>
-            <option value="1">연속식 - 유동상</option>
-            <option value="2">준연속식 - 고정상</option>
-            <option value="3">준연속식 - 유동상</option>
-            <option value="4">화분식 - 고정상</option>
-            <option value="5">화분식 - 유동상</option>
-            <option value="6">기타</option>
+        <select v-model="tech" class="addInfo_input" id="supplier_drop_steam" style="margin-left:108px">
+            <option value="연속식 - 고정상">연속식 - 고정상</option>
+            <option value="연속식 - 유동상">연속식 - 유동상</option>
+            <option value="준연속식 - 고정상">준연속식 - 고정상</option>
+            <option value="준연속식 - 유동상">준연속식 - 유동상</option>
+            <option value="화분식 - 고정상">화분식 - 고정상</option>
+            <option value="화분식 - 유동상">화분식 - 유동상</option>
+            <option value="기타">기타</option>
         </select>
     </div>
     <div class="add_info_divide" >소각 양
@@ -81,10 +81,11 @@ import {ref,computed} from 'vue'
     export default {
         name :"waste_disposal_filling",
         setup(){
-            
+            var waste=ref("종이/판지")
             var kindOfwaste= ref("0")
+            var tech = ref("연속식 - 고정상")
             var waste_life_list = ref([
-                    "종이/편지",
+                    "종이/판지",
                     "섬유",
                     "음식물",
                     "목재",
@@ -112,27 +113,35 @@ import {ref,computed} from 'vue'
             ])
             const store = useStore()
             function click_regi_btn(){
-                var info_list= {
-                    content:"",
-                    data:"",
-                    emissions:"",
+                var info_list={
+                    Type:"15",
+                    DetailType:"",
                     StartDate:"",
                     EndDate:"",
-                    scope:11,
-                    category:"15",
-                    unit:"ton"
-                    }
+                    Location:"",
+                    scope:1,
+                    data:"",
+                    R:"",
+                    emissions:"",
+                    Carbonunit:"ton",
+                    CarbonActivity:"",
+                    kind:"",
+                    Division:{건물명:"",운영주체:"",공급처:"",연료종류:""}
+                }
                 var usage_input = document.getElementById('steam_usage_input').value
-                info_list.content = document.getElementById('carbon_emissions_content').value
+                info_list.CarbonActivity = document.getElementById('carbon_emissions_content_incineration').value
                 info_list.data =  usage_input+"/"+"ton"
                 info_list.emissions = usage_input+4
                 info_list.StartDate = document.getElementById('start_data').value+'-01'
                 info_list.EndDate = document.getElementById('end_data').value+'-01'
-
+                info_list.DetailType = waste.value
+                info_list.kind = tech.value
                 store.commit("SetTableContent",info_list)
             }
             return {
                 kindOfwaste,
+                waste,
+                tech,
                 waste_life_list,
                 waste_corpor_list,
                 click_regi_btn

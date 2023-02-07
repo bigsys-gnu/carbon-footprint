@@ -29,6 +29,7 @@ export default createStore({
         accessToken: null,
         refreshToken: null,
         infopage:false,
+        scopes:[0,0,0],
 
         //카테고리
         CarbonCategories : [
@@ -49,8 +50,8 @@ export default createStore({
             "폐기물처리시설(매립)",
             "폐기물처리시설(소각)",
             "폐기물처리시설(하수처리)",
-            "폐기물처리시설(생물학적처리)",
-            "폐기물처리시설(폐수처리)"
+            "폐기물처리시설(생물학적)",
+            "폐기물처리시설(폐수)"
         ]
     }
     //state 데이터 호출후 상태 가공하여 전달 
@@ -66,6 +67,9 @@ export default createStore({
     } 
     //상태 접근 (변경)
     ,mutations:{
+        set_scopes(state,arr){
+            state.scopes=arr
+        },
         OnEdit(state){
             state.EditGroups = true;
         },
@@ -107,13 +111,12 @@ export default createStore({
         },
         SetTableContent(state,arr){
             state.table.unshift(arr)
-            console.log("테이블 추가",state.table[0].category)
         },
         DelTableContent(state,remove){
             for(let i=0; i<remove.length; i++){
                 console.log('삭제',remove[i].data)
                 state.table = state.table.filter((element) =>
-                                                element.content != remove[i].content ||
+                                                element.CarbonActivity != remove[i].CarbonActivity ||
                                                 element.data != remove[i].data ||
                                                 element.emissions != remove[i].emissions ||
                                                 element.StartDate != remove[i].StartDate ||
@@ -133,7 +136,7 @@ export default createStore({
             for(let i=0; i<remove.length; i++){
                 console.log('삭제',remove[i].data)
                 state.total_table = state.total_table.filter((element) =>
-                                                element.content != remove[i].content ||
+                                                element.CarbonActivity != remove[i].CarbonActivity ||
                                                 element.data != remove[i].data ||
                                                 element.emissions != remove[i].emissions ||
                                                 element.StartDate != remove[i].StartDate ||

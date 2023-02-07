@@ -75,23 +75,23 @@ import {ref} from 'vue'
             var detail = ref("침엽수")
             const store = useStore()
             function click_regi_btn(){
-                var info_list = {
+                var info_list={
+                    Type:"6",
                     DetailType:"",
                     StartDate:"",
                     EndDate:"",
                     Location:"",
-                    scope:1, 
-                    usage:"",
-                    unit:"ton",
-                    category:"4",
-                    CarbonActivity:"",
-                    kind:"", 
-                    Division:{건물명:"",설비명:""},
+                    scope:1,
+                    data:"",
                     emissions:"",
+                    Carbonunit:"ton",
+                    CarbonActivity:"",
+                    kind:"",
+                    Division:{건물명:"",설비명:""},
                 }
                 var usage_input = document.getElementById('usage_input').value
                 info_list.CarbonActivity = document.getElementById('carbon_emissions_content').value
-                info_list.usage =  usage_input+"/ha"
+                info_list.data =  usage_input+"/ha"
                 info_list.emissions = usage_input+4
                 info_list.StartDate = document.getElementById('start_data').value+'-01'
                 info_list.EndDate = document.getElementById('end_data').value+'-01'

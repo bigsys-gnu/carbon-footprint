@@ -6,7 +6,7 @@
     </div>
     <div style="margin-top:50px; ">
         탄소 배출 내용<br>
-        <input type="text" class="addInfo_input" id="carbon_emissions_content">
+        <input type="text" class="addInfo_input" id="carbon_emissions_content_steam2">
     </div> 
     <div style="margin-top:30px">기간 설정
         <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true">
@@ -26,15 +26,15 @@
     </div>
     <div class="add_info_divide">공급처
         <select class="addInfo_input" id="supplier_drop">
-            <option value="0">한국지역난방공사</option>
-            <option value="1">직접 입력</option>
+            <option value="한국지역난방공사">한국지역난방공사</option>
+            <option value="직접 입력">직접 입력</option>
         </select>
     </div>
     <div class="add_info_divide">연료 종류
-        <select class="addInfo_input" id="supplier_drop_steam">
-            <option value="0">스팀(열전용)</option>
-            <option value="1">스팀(열병합)</option>
-            <option value="2">스팀(일반)</option>
+        <select v-model="연료종류" class="addInfo_input" id="supplier_drop_steam">
+            <option value="스팀(열전용)">스팀(열전용)</option>
+            <option value="스팀(열병합)">스팀(열병합)</option>
+            <option value="스팀(일반)">스팀(일반)</option>
         </select>
     </div>
     <div class="add_info_divide" >열 사용량
@@ -81,24 +81,34 @@ import { ref } from 'vue'
             const store = useStore()
             var unit_s = ref("GJ")
             var main_agent = ref('기업')
-
+            var 연료종류 = ref('스팀(열전용)')
+            var 공급처 = ref('한국지역난방공사')
             function click_regi_btn(unit_s){
                 var info_list={
-                    content:"",
-                    data:"",
-                    emissions:"",
+                    Type:"8",
+                    DetailType:"열",
                     StartDate:"",
                     EndDate:"",
-                    scope:1,
-                    category:"8",
-                    unit:unit_s}
+                    Location:"",
+                    scope:2,
+                    data:"",
+                    emissions:"",
+                    Carbonunit:unit_s,
+                    CarbonActivity:"",
+                    kind:"",
+                    Division:{건물명:"",운영주체:"",공급처:"",연료종류:""}
+                }
                 var usage_input = document.getElementById('steam_usage_input').value
-                info_list.content = document.getElementById('carbon_emissions_content').value
+                info_list.CarbonActivity = document.getElementById('carbon_emissions_content_steam2').value
                 info_list.data =  usage_input+"/"+unit_s
                 info_list.emissions = usage_input + 4 + "kg" //계산식
                 info_list.StartDate = document.getElementById('start_data').value+'-01'
                 info_list.EndDate = document.getElementById('end_data').value+'-01'
-
+                info_list.Division.건물명 = document.getElementById('building_name_text').value
+                info_list.Division.운영주체 = main_agent.value
+                info_list.Division.공급처 = 공급처.value
+                info_list.Division.연료종류 = 연료종류.value
+    
                 if(main_agent.value == '기업'){
                     info_list.scope = 1
                 }
@@ -110,7 +120,9 @@ import { ref } from 'vue'
             return{
                 unit_s,
                 main_agent,
-                click_regi_btn
+                click_regi_btn,
+                연료종류,
+                공급처
             }
         }
     }

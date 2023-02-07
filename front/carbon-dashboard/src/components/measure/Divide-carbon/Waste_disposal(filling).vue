@@ -6,13 +6,27 @@
     </div>
     <div style="margin-top:50px; ">
         탄소 배출 내용<br>
-        <input type="text" class="addInfo_input" id="carbon_emissions_content">
+        <input type="text" class="addInfo_input" id="carbon_emissions_content_filling">
     </div> 
     <div class="add_info_divide" id="building_name_text" style="margin-top:4vh;">시설명/위치
         <input type="text" class="addInfo_input" style="margin-left:94px;" id ="building_name_input" placeholder="경상대 본관">
     </div>
-    <div style="margin-top:30px">매립 시작 날짜
-        <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true">
+    <div style="margin-top:30px">매립 시작년도
+        <input class = "date_btn" id = "start_data" placeholder="2021" required aria-required="true"> 년
+    </div>
+    <div>
+        <div class="add_info_divide" style="float:left; width:600px; height:5vh">매입량
+            <input class="addInfo_input" id="steam_usage_input" placeholder="12,456" style="margin-left:132px; width:200px; margin-right:10px">
+            <select class="addInfo_input" id="steam_usage_drop" style="width:4vw">
+                <option value="0">ton</option>
+            </select>
+        </div>
+        <div class="add_info_divide" style=" width:200x;">메탄회수량
+            <input class="addInfo_input" id="steam_usage_input_R" placeholder="12,456" style="width:200px; margin-left:30px; margin-right:10px">
+            <select class="addInfo_input" id="steam_usage_drop" style="width:3.5vw; margin-left:0.2vw">
+                <option value="0">ton</option>
+            </select>
+        </div>
     </div>
 
     <div class="add_info_divide">폐기물 분류
@@ -38,12 +52,9 @@
             <option value="4">기타</option>
         </select>
     </div>
-    <div class="add_info_divide" >매립 양
-        <input class="addInfo_input" id="steam_usage_input" placeholder="12,456" style="margin-left:120px">
-        <select class="addInfo_input" id="steam_usage_drop">
-            <option value="0">ton</option>
-        </select>
-    </div>
+    
+    
+    
     <button class ="input2_regi_btn" id="add_info_regi_btn" @click="click_regi_btn()">상단 정보 등록</button>
 </template>
 
@@ -78,6 +89,8 @@ import {ref, computed} from 'vue'
         name :"waste_disposal_filling",
         setup(){
             const store = useStore()
+            var startDate = ref("")
+            var endDate = ref("")
             var kindOfwaste =  ref(0)
             var waste_life_list = ref([
                     "혼합 폐기물",
@@ -107,22 +120,28 @@ import {ref, computed} from 'vue'
                 "폐수 슬러지"
             ])
             function click_regi_btn(){
-                var  info_list = {
-                    content:"",
-                    data:"",
-                    emissions:"",
+                var info_list={
+                    Type:"14",
+                    DetailType:"",
                     StartDate:"",
                     EndDate:"",
-                    scope:1, 
-                    category:"14",
-                    unit:"ton"
+                    Location:"",
+                    scope:1,
+                    data:"",
+                    R:"",
+                    emissions:"",
+                    Carbonunit:"ton",
+                    CarbonActivity:"",
+                    kind:"",
+                    Division:{건물명:"",운영주체:"",공급처:"",연료종류:""}
+
                 }
                 var usage_input = document.getElementById('steam_usage_input').value
-
-                info_list.content = document.getElementById('carbon_emissions_content').value
+                inf
+                info_list.CarbonActivity = document.getElementById('carbon_emissions_content_filling').value
                 info_list.data =  usage_input+"/"+"ton"
                 info_list.emissions = usage_input+4
-                info_list.StartDate = document.getElementById('start_data').value+'-01'
+                info_list.StartDate = document.getElementById('start_data').value+'-01'+'-01'
                 //info_list.EndDate = document.getElementById('end_data').value
                 
                 store.commit("SetTableContent",info_list)
@@ -131,6 +150,8 @@ import {ref, computed} from 'vue'
                 kindOfwaste,
                 waste_life_list,
                 waste_corpor_list,
+                startDate,
+                endDate,
                 click_regi_btn
             }
         }

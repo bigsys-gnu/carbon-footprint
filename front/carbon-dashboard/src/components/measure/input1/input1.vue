@@ -200,7 +200,9 @@
             }
             }
             async function get_total_emission(){
-                await axios.get("Company/Preview/samsung/2023-0"+month.value+"-01/2023-0"+month.value+"-28",config).then(res => {
+                var path = "Company/Preview/"+group_name.value+"/2023-0"+month.value+"-01/2023-0"+month.value+"-28"
+                console.log("경로,날짜",path)
+                await axios.get(path,config).then(res => {
                     //scope12CarbonEmission.value = res.data.Scopes[0]+res.data.Scopes[1]
                     //scope3CarbonEmission.value = res.data.Scopes[2]
                 })

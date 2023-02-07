@@ -56,7 +56,7 @@ export default {
       var columns= [
         {
           label: '탄소 배출 내용',
-          field: 'content',
+          field: 'CarbonActivity',
         },
         {
           label: '활동 데이터',
@@ -121,18 +121,19 @@ export default {
                         "CarbonData": {
                             "StartDate":(data.StartDate),
                             "EndDate":(data.EndDate),
-                            "Location": "",
-                            "Scope":  1, //Number(data.scope), int 타입으로 수정해야함 
-                            "Category":10,
-                            "CarbonActivity": (data.content),
-                            "CarbonUnit": (data.unit),
+                            "Location": (data.Location),
+                            "Scope":  (data.scope),
+                            "CarbonActivity": (data.CarbonActivity),
+                            "CarbonUnit": (data.Carbonunit),
                             "usage": (data.data), //carbon data
-                            "Chief": "jeong"
+                            "Chief": "jeong",
+                            "Kind" :(data.kind),
+                            "Division":""
                         },
-                        "DetailType":store.state.CarbonCategories[Number(data.category)],
+                        "DetailType":store.state.CarbonCategories[Number(data.Type)],
                         //"RootCom":"samsung",
                         //"BelongCom":"",
-                        "Type":store.state.CarbonCategories[Number(data.category)]
+                        "Type":store.state.CarbonCategories[Number(data.DetailType)]
                     }
                     console.log((input_data))
                     get_total_emission(input_data)
@@ -178,14 +179,14 @@ export default {
               for(var i=0;i<res.data.length;i++){
                 var info_list={id:"",content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"", category:""}
                 info_list.id = res.data[i].id
-                info_list.content = res.data[i].CarbonActivity
-                info_list.data =  res.data[i].CarbonData + "kg"
-                info_list.emissions = res.data[i].CarbonTrans + res.data[i].CarbonUnit
+                info_list.CarbonActivity = res.data[i].CarbonActivity
+                info_list.data =  res.data[i].CarbonData + res.data[i].CarbonUnit
+                info_list.emissions = res.data[i].CarbonTrans + "kg"
                 info_list.StartDate = res.data[i].CarbonInfo.StartDate   //api추가되면 수정 
                 info_list.EndDate = res.data[i].CarbonInfo.EndDate 
                 info_list.scope = res.data[i].CarbonInfo.Scope 
                 console.log(res.data[i].CarbonInfo.Category )
-                info_list.category = res.data[i].CarbonInfo.Category 
+                info_list.Type = res.data[i].CarbonInfo.Category 
                 rows.value.unshift(info_list)
               }     
           })

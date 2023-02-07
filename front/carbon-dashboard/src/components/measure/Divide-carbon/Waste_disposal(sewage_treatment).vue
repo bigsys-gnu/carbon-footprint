@@ -6,7 +6,7 @@
     </div>
     <div style="margin-top:50px; ">
         탄소 배출 내용<br>
-        <input type="text" class="addInfo_input" id="carbon_emissions_content">
+        <input type="text" class="addInfo_input" id="carbon_emissions_content_sewage">
     </div> 
     <div class="add_info_divide" id="building_name_text" style="margin-top:4vh">시설명/위치
         <input type="text" class="addInfo_input" id ="building_name_input" placeholder="성남시" style="margin-left:130px;">
@@ -22,31 +22,31 @@
         </select>
     </div>
     <div class="add_info_divide" style=" width:200x;">메탄회수량
-        <input class="addInfo_input" id="steam_usage_input" placeholder="12,456" style="width:200px; margin-left:140px; margin-right:10px">
+        <input class="addInfo_input" id="steam_usage_input_R" placeholder="12,456" style="width:200px; margin-left:140px; margin-right:10px">
         <select class="addInfo_input" id="steam_usage_drop" style="width:3.5vw; margin-left:0.2vw">
             <option value="0">ton</option>
         </select>
     </div>
     <div class="add_info_divide" style="float:left; width:600px;">유입 산소 요구량 농도(BOD)
-        <input class="addInfo_input" id="steam_usage_input" placeholder="12,456" style="width:200px; margin-left:30px; margin-right:10px">
+        <input class="addInfo_input" id="steam_usage_input_BODIN" placeholder="12,456" style="width:200px; margin-left:30px; margin-right:10px">
         <select class="addInfo_input" id="steam_usage_drop" style="width:3.5vw">
             <option value="0">mg/L</option>
         </select>
     </div>
     <div class="add_info_divide" >유출 산소 요구량 농도(BOD)
-        <input class="addInfo_input" id="steam_usage_input" placeholder="12,456" style="width:200px; margin-left:30px">
+        <input class="addInfo_input" id="steam_usage_input_BODOUT" placeholder="12,456" style="width:200px; margin-left:30px">
         <select class="addInfo_input" id="steam_usage_drop" style="width:3.5vw">
             <option value="0">mg/L</option>
         </select>
     </div>
-    <div class="add_info_divide" style="float:left; width:600px">유입 질소 요구량 농도(BOD)
-        <input class="addInfo_input" id="steam_usage_input" placeholder="12,456" style="width:200px; margin-left:30px; margin-right:10px">
+    <div class="add_info_divide" style="float:left; width:600px">유입 질소 요구량 농도(TN)
+        <input class="addInfo_input" id="steam_usage_input_TNIN" placeholder="12,456" style="width:200px; margin-left:30px; margin-right:10px">
         <select class="addInfo_input" id="steam_usage_drop" style="width:3.5vw">
             <option value="0">mg/L</option>
         </select>
     </div>
-    <div class="add_info_divide"  >유출 질소 요구량 농도(BOD)
-        <input class="addInfo_input" id="steam_usage_input" placeholder="12,456" style="width:200px; margin-left:30px;">
+    <div class="add_info_divide"  >유출 질소 요구량 농도(TN)
+        <input class="addInfo_input" id="steam_usage_input_TNOUT" placeholder="12,456" style="width:200px; margin-left:30px;">
         <select class="addInfo_input" id="steam_usage_drop" style="width:3.5vw">
             <option value="0">mg/L</option>
         </select>
@@ -63,7 +63,35 @@
         color: #727374
     }
 
-    #steam_usage_input{
+    #steam_usage_input_BODIN{
+        margin-left:90px;
+        width:14%;
+        background: #ffffff;
+        border: 1px solid #DDE2E5;
+    }
+
+    #steam_usage_input_BODOUT{
+        margin-left:90px;
+        width:14%;
+        background: #ffffff;
+        border: 1px solid #DDE2E5;
+    }
+
+    #steam_usage_input_TNIN{
+        margin-left:90px;
+        width:14%;
+        background: #ffffff;
+        border: 1px solid #DDE2E5;
+    }
+
+    #steam_usage_input_TNOUT{
+        margin-left:90px;
+        width:14%;
+        background: #ffffff;
+        border: 1px solid #DDE2E5;
+    }
+    
+    #steam_usage_input_R{
         margin-left:90px;
         width:14%;
         background: #ffffff;
@@ -89,23 +117,37 @@ import {ref} from 'vue'
         setup(){
             const store = useStore()
             function click_regi_btn(){
-                var info_list = {
-                    content:"",
-                    data:"",
-                    emissions:"",
+                var info_list={
+                    Type:"16",
+                    DetailType:"하수처리",
                     StartDate:"",
                     EndDate:"",
+                    Location:"",
                     scope:1,
-                    category:"16",
-                    unit:"ton"
+                    data:"",
+                    R:"",
+                    BODIN:"",
+                    BODOUT:"",
+                    TNIN:"",
+                    TNOUT:"",
+                    emissions:"",
+                    Carbonunit:"ton",
+                    CarbonActivity:"",
+                    kind:"",
+                    Division:{건물명:"",운영주체:"",공급처:"",연료종류:""}
                 }
                 var usage_input = document.getElementById('steam_usage_input').value
-                info_list.content = document.getElementById('carbon_emissions_content').value
+                info_list.CarbonActivity = document.getElementById('carbon_emissions_content_sewage').value
                 info_list.data =  usage_input+"/"+"ton"
                 info_list.emissions = usage_input+4
-                info_list.StartDate = document.getElementById('start_data').value
-                info_list.EndDate = document.getElementById('end_data').value
-
+                info_list.StartDate = document.getElementById('start_data').value+"-01"
+                info_list.EndDate = document.getElementById('end_data').value+"-01"
+                info_list.R=document.getElementById('steam_usage_input_R').value
+                info_list.BODIN=document.getElementById('steam_usage_input_BODIN').value
+                info_list.BODOUT=document.getElementById('steam_usage_input_BODOUT').value
+                info_list.TNIN=document.getElementById('steam_usage_input_TNIN').value
+                info_list.TNOUT=document.getElementById('steam_usage_input_TNOUT').value
+                
                 store.commit("SetTableContent",info_list)
             }
             return{

@@ -233,7 +233,7 @@ import { useRouter } from "vue-router";
             var selected_category = ref('')
             var showCategory = ref('null')
             var info_board_defalt = ref(true)
-           
+            var group_name = computed(() => store.state.group_name)
 
             var category_option_list = ref([
                     {index:"1", name:"전력 사용"},
@@ -282,31 +282,69 @@ import { useRouter } from "vue-router";
                 for(var row in table.value){
                     const data = (table.value[row])
                     console.log("row = "+JSON.stringify(data))
+
                     var input_data = {
                         "CarbonData": {
                             "StartDate":(data.StartDate),
                             "EndDate":(data.EndDate),
-                            "Location": "",
+                            "Location": (data.Location),
                             "Scope":  (data.scope),
                             "CarbonActivity": (data.CarbonActivity),
-                            "CarbonUnit": (data.unit),
+                            "CarbonUnit": (data.Carbonunit),
                             "usage": (data.data), //carbon data
+                            "nums":0,
                             "Chief": "jeong",
-                            "Kind" :"",
-                            "Division":""
+                            "kind" :(data.kind),
+                            "Division":{},
+                            "R":0,
+                            "Fert":0,
+                            "BODIN":0,
+                            "BODOUT":0,
+                            "TNIN":0,
+                            "TNOUT":0,
+                            "CODIN":0,
+                            "CODOUT":0,
+                            "ProcessType":"",
+                            "ProcessKind":""
                         },
-                        "DetailType":store.state.CarbonCategories[Number(data.DetailType)],
+                        "DetailType":data.DetailType,
                         //"RootCom":"samsung",
                         //"BelongCom":"",
-                        "Type":store.state.CarbonCategories[Number(data.category)]
+                        "Type":store.state.CarbonCategories[Number(data.Type)]
                     }
+                    
+                    if(Number(data.Type)==4){
+                        input_data.CarbonData.Fert = Number(data.Fert)
+                    }
+                    else if(Number(data.Type)==2){
+                        input_data.CarbonData.nums = Number(data.nums)
+                    }
+                    else if(Number(data.Type)>=15 && Number(data.Type)<=18){
+                        input_data.CarbonData.R = Number(data.R)
+                        if(Number(data.Type)==16){
+                            input_data.CarbonData.BODIN = Number(data.BODIN)
+                            input_data.CarbonData.BODOUT = Number(data.BODOUT)
+                            input_data.CarbonData.TNIN = Number(data.TNIN)
+                            input_data.CarbonData.TNOUT=Number(data.TNOUT)
+                        }
+                        else if(Number(data.Type)==18){
+                            input_data.CarbonData.CODIN = Number(data.CODIN)
+                            input_data.CarbonData.CODOUT = Number(data.CODOUT)
+                        }
+                        else if(Number(data.Type)==17){
+                            input_data.CarbonData.ProcessKind = (data.ProcessKind)
+                            input_data.CarbonData.ProcessType = (data.ProcessType)
+                        }
+                    }
+
                     console.log((input_data))
                     get_total_emission(input_data)
                 }
                 //{id:"",content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:""}
                 async function get_total_emission(input_data){
-                    await axios.post("/CarbonEmission/samsung",input_data,config).then(res => {
-                        console.log(JSON.stringify(input_data)) //carbon~/회사이름
+                    var path = "/CarbonEmission/"+group_name.value
+                    await axios.post(path,input_data,config).then(res => {
+                        console.log(JSON.stringify(input_data))
                     })
                     .catch(error => {
                         console.log('send data'+JSON.stringify(input_data))

@@ -6,7 +6,7 @@
     </div>
     <div style="margin-top:50px; ">
         탄소 배출 내용<br>
-        <input type="text" class="addInfo_input" id="carbon_emissions_content">
+        <input type="text" class="addInfo_input" id="carbon_emissions_conten_wasteWater">
     </div> 
     <div class="add_info_divide" id="building_name_text" style="margin-top: 4vh;">시설명/위치
         <input type="text" class="addInfo_input" id ="building_name_input" placeholder="경상대 본관" style="margin-left:120px;">
@@ -22,19 +22,19 @@
         </select>
     </div>
     <div class="add_info_divide" style="width:600px;" >메탄 회수량
-        <input class="addInfo_input" id="steam_usage_input" style="width:200px; margin-left:120px" placeholder="12,456">
+        <input class="addInfo_input" id="steam_usage_input_R" style="width:200px; margin-left:120px" placeholder="12,456">
         <select class="addInfo_input" id="steam_usage_drop" style="width:3.5vw; margin-left:12px;">
             <option value="0">ton</option>
         </select>
     </div>
     <div class="add_info_divide" style="float:left; width:600px;" >유입 농도(COD)
-        <input class="addInfo_input" id="steam_usage_input" style="width:200px; margin-left:95px" placeholder="12,456">
+        <input class="addInfo_input" id="steam_usage_input_CODIN" style="width:200px; margin-left:95px" placeholder="12,456">
         <select class="addInfo_input" id="steam_usage_drop" style="width:3.5vw; margin-left:12px;">
             <option value="0">mg/L</option>
         </select>
     </div>
     <div class="add_info_divide" >유출 농도(COD)
-        <input class="addInfo_input" id="steam_usage_input" placeholder="12,456" style="margin-left:50px">
+        <input class="addInfo_input" id="steam_usage_input_CODOUT" placeholder="12,456" style="margin-left:50px">
         <select class="addInfo_input" id="steam_usage_drop">
             <option value="0">mg/L</option>
         </select>
@@ -63,6 +63,18 @@
         color: #727374;
         margin-bottom: 20px;
     }
+    #steam_usage_input_CODIN{
+        margin-left:90px;
+        width:14%;
+        background: #ffffff;
+        border: 1px solid #DDE2E5;
+    }
+    #steam_usage_input_CODOUT{
+        margin-left:90px;
+        width:14%;
+        background: #ffffff;
+        border: 1px solid #DDE2E5;
+    }
 
    
 </style>
@@ -75,22 +87,32 @@ import {ref} from 'vue'
         setup(){
             const store = useStore()
             function click_regi_btn(){
-                var info_list = {
-                    content:"",
-                    data:"",
-                    emissions:"",
+                var info_list={
+                    Type:"18",
+                    DetailType:"폐수",
                     StartDate:"",
                     EndDate:"",
+                    Location:"",
                     scope:1,
-                    category:"18",
-                    unit:"ton"
+                    data:"",
+                    R:"",
+                    CODIN:"",
+                    CODOUT:"",
+                    emissions:"",
+                    Carbonunit:"ton",
+                    CarbonActivity:"",
+                    kind:"",
+                    Division:{건물명:"",운영주체:"",공급처:"",연료종류:""}
                 }
                 var usage_input = document.getElementById('steam_usage_input').value
-                info_list.content = document.getElementById('carbon_emissions_content').value
+                info_list.CarbonActivity = document.getElementById('carbon_emissions_conten_wasteWater').value
                 info_list.data =  usage_input+"/"+"ton"
                 info_list.emissions = usage_input+4
                 info_list.StartDate = document.getElementById('start_data').value+'-01'
                 info_list.EndDate = document.getElementById('end_data').value+'-01'
+                info_list.R=document.getElementById('steam_usage_input_R').value
+                info_list.CODIN=document.getElementById('steam_usage_input_CODIN').value
+                info_list.CODOUT=document.getElementById('steam_usage_input_CODOUT').value
                 store.commit("SetTableContent",info_list)
             }
             return{

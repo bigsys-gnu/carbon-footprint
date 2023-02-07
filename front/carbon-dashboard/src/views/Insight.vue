@@ -34,9 +34,9 @@
               <span class="date_info_btn" @click="click_back_month()"> ＜ </span>
               <span class="date_info">{{ year }}년 {{ month }}월</span>
               <span class="date_info_btn" @click="click_plus_month()"> ＞ </span><br>
-              <dashboard3Vue :scope1="scope1" :scope2="scope2" :scope3="scope3"></dashboard3Vue>
-              <dashboard4Vue></dashboard4Vue>
-              <Dashboard5></Dashboard5>
+              <dashboard3Vue :scope1="scope1" :scope2="scope2" :scope3="scope3" :key="rerender_signal"></dashboard3Vue>
+              <dashboard4Vue :key="rerender_signal"></dashboard4Vue>
+              <Dashboard5 :key="rerender_signal"></Dashboard5>
    
             </div>
             <!-- 년 그래프 -->
@@ -44,9 +44,9 @@
               <span class="date_info_btn" @click="click_back_year()"> ＜ </span>
               <span class="date_info">{{ year }}년</span>
               <span class="date_info_btn" @click="click_plus_year()"> ＞ </span><br>
-              <dashboard3Vue></dashboard3Vue>
-              <dashboard4Vue></dashboard4Vue>
-              <Dashboard5></Dashboard5>
+              <dashboard3Vue :scope1="scope1" :scope2="scope2" :scope3="scope3" :key="rerender_signal"></dashboard3Vue>
+              <dashboard4Vue :key="rerender_signal"></dashboard4Vue>
+              <Dashboard5 :key="rerender_signal"></Dashboard5>
             </div>
           </div>
       </div>
@@ -134,6 +134,7 @@ import { computed,ref } from "vue";
           var scope2 = ref(0)
           var scope3 = ref(0)
           var total_emission = ref(0)
+          var rerender_signal = ref(0)
           var datail_emission_arr = ref([])
           
           function click_month(){
@@ -142,6 +143,7 @@ import { computed,ref } from "vue";
             category_dashboard_year.value = false
             history.value = false
             console.log(category_dashboard_month,category_dashboard_year)
+            get_total_emission_month()
           }
           function click_year(){
             console.log("년")
@@ -149,6 +151,7 @@ import { computed,ref } from "vue";
             category_dashboard_year.value = true
             history.value = false
             console.log(category_dashboard_month,category_dashboard_year)
+            get_total_emission_year()
           }
           function click_3year(){
             history.value = true
@@ -156,20 +159,24 @@ import { computed,ref } from "vue";
             category_dashboard_year.value = false
           }
           function click_back_month(){
-            get_total_emission()
             store.commit("InsightAddM",-1);
+            get_total_emission_month()
+            
           }
           function click_plus_month(){
-            get_total_emission()
             store.commit("InsightAddM",1);
+            get_total_emission_month()
+            
           }
           function click_back_year(){
-            get_total_emission()
-            store.commit("InsightAddY",1);
+            store.commit("InsightAddY",-1);
+            get_total_emission_year()
+            
           }
           function click_plus_year(){
-            get_total_emission()
             store.commit("InsightAddY",1);
+            get_total_emission_year()
+            
           }
           
           
@@ -179,14 +186,15 @@ import { computed,ref } from "vue";
               "Content-Type": "text/html; charset=utf-8"
             }
           }
-          async function get_total_emission(){
+          async function get_total_emission_month(){
               await axios.get("Company/Preview/samsung/"+year.value+"-"+month.value+"-01/"+year.value+"-"+month.value+"-28",config).then(res => {
                     console.log(res.data)
                     console.log("연월"+year.value+month.value)
-                    this.scope1 = res.data.Scopes[0]
-                    this.scope2 = res.data.Scopes[1]
-                    this.scope3 = res.data.Scopes[2]
+                    scope1.value = res.data.Scopes[0]
+                    scope2.value = res.data.Scopes[1]
+                    scope3.value = res.data.Scopes[2]
                     total_emission  = res.data.Scopes.reduce((a, b) => a + b, 0)
+                    store.commit("set_scopes",res.data.Scopes);
                     store.commit("SetDetailEmission",res.data.EmissionList);
                 })
                 .catch(error => {
@@ -194,17 +202,37 @@ import { computed,ref } from "vue";
                     console.log("insight")
                 })
                 .finally(() => {
+                  rerender_signal.value +=1
+                })
+            }
+            async function get_total_emission_year(){
+              await axios.get("Company/Preview/samsung/"+year.value+"-01-01/"+year.value+"-12-28",config).then(res => {
+                    console.log(res.data)
+                    console.log("연월"+year.value)
+                    scope1.value = res.data.Scopes[0]
+                    scope2.value = res.data.Scopes[1]
+                    scope3.value = res.data.Scopes[2]
+                    total_emission  = res.data.Scopes.reduce((a, b) => a + b, 0)
+                    store.commit("set_scopes",res.data.Scopes);
+                    store.commit("SetDetailEmission",res.data.EmissionList);
+                })
+                .catch(error => {
+                    console.log(error)
+                    console.log("insight")
+                })
+                .finally(() => {
+                  rerender_signal.value +=1
                 })
             }
         return{history,category_dashboard_month,category_dashboard_year,month,year,scope1,scope2,scope3,
-          click_month,click_year,click_3year,click_back_year,click_plus_year,get_total_emission,
-          click_back_month,click_plus_month,datail_emission_arr
+          click_month,click_year,click_3year,click_back_year,click_plus_year,get_total_emission_month,get_total_emission_year,
+          click_back_month,click_plus_month,datail_emission_arr,rerender_signal
         
         }
 
       },
       created(){
-        this.get_total_emission()
+        this.get_total_emission_month()
       },  
   }
 </script>

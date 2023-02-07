@@ -28,7 +28,7 @@
                         </select>
                     </div>
                     <div class="add_info_divide">가축 유형
-                        <select class="addInfo_input" id="supplier_drop" style="margin-left:90px; width:11.5vw; height:3.5vh">
+                        <select v-model="detail" class="addInfo_input" id="supplier_drop" style="margin-left:90px; width:11.5vw; height:3.5vh">
                             <option v-for="animal in animal_list" :value="animal">{{animal}}</option>
                         </select>
                     </div>
@@ -72,6 +72,7 @@ import axios from "axios";
     export default {
         name :"power_usage",
         setup(){
+            var detail = ref('젖소-육성우')
             const store = useStore()
             var selected = computed(()=>store.state.selected_row);
             
@@ -106,14 +107,54 @@ import axios from "axios";
             ]
             //
             async function click_edit_btn(){
-                var info_list = {content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"1", category:"5"}
-
+                var info_list={
+                    Type:"5",
+                    DetailType:"",
+                    StartDate:"",
+                    EndDate:"",
+                    Location:"",
+                    scope:1,
+                    data:"",
+                    emissions:"",
+                    Carbonunit:"마리",
+                    CarbonActivity:"",
+                    kind:"",
+                    Division:{동물사육위치:""},
+                }
                 var usage_input = document.getElementById('usage_input').value
-                info_list.content = document.getElementById('carbon_emissions_content_animal').value
+                info_list.CarbonActivity = document.getElementById('carbon_emissions_content_animal').value
                 info_list.data = document.getElementById('usage_input').value+"/"+"마리"
                 info_list.emissions= usage_input+4
                 info_list.StartDate = document.getElementById('start_data').value+'-01'
                 info_list.EndDate = document.getElementById('end_data').value+'-01'
+
+                if ( detail == '젖소-육성우' || '젖소-착유우'){
+                    info_list.DetailType = '젖소'
+                    if( detail == '젖소-착유우' ) {
+                        info_list.kind = '착유우'
+                    }
+                    info_list.kind = '육성우'
+                }
+                else if ( detail == '한육우-송아지' || '한육우-번식우' || '한육우-비육우'){
+                    info_list.DetailType = '한육우'
+                    if( detail == '한육우-송아지' ) {
+                        info_list.kind = '송아지'
+                    }
+                    else if ( detail == '번식우'){
+                        info_list.kind = '번식우'
+                    }
+                    info_list.kind="비육우"
+                }
+                else if ( detail = "닭-산란계" || "닭-육계" || "닭-기타닭"){
+                    if( detail == '닭-산란계' ) {
+                        info_list.kind = '산란계'
+                    }
+                    else if ( detail == '닭-육계'){
+                        info_list.kind = '육계'
+                    }
+                    info_list.kind="기타닭"
+                } // 가축 유형
+        
 
                 var plz = {
                         "CarbonData": {

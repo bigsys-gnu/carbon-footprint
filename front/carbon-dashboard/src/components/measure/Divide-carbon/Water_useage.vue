@@ -7,7 +7,7 @@
     </div>
     <div style="margin-top:50px; ">
         탄소 배출 내용<br>
-        <input type="text" class="addInfo_input" id="carbon_emissions_content">
+        <input type="text" class="addInfo_input" id="carbon_emissions_content_water">
     </div> 
     <div style="margin-top:30px">기간 설정
         <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true" style="margin-left:80px">
@@ -25,9 +25,9 @@
         
     </div>
     <div class="add_info_divide">공급처
-        <select class="addInfo_input" id="supplier_drop">
-            <option value="0">한국수자원공사</option>
-            <option value="1">직접 입력</option>
+        <select v-model="공급처" class="addInfo_input" id="supplier_drop">
+            <option value="한국수자원공사">한국수자원공사</option>
+            <option value="직접 입력">직접 입력</option>
         </select>
     </div>
     <div class="add_info_divide" >수도 사용량
@@ -57,25 +57,33 @@ import {ref} from 'vue'
         setup(){
             var unit_s = ref('m3')
             var main_agent = ref('기업')
+            var 공급처 = ref('한국수자원공사')
             const store = useStore()
             function click_regi_btn(){
-                var info_list = {
-                    content:"",
-                    data:"",
-                    emissions:"",
+                var info_list={
+                    Type:"9",
+                    DetailType:"수도",
                     StartDate:"",
                     EndDate:"",
+                    Location:"",
                     scope:1,
-                    category:"9", 
-                    unit:"m3"
+                    data:"",
+                    emissions:"",
+                    Carbonunit:"m3",
+                    CarbonActivity:"",
+                    kind:"",
+                    Division:{건물명:"",운영주체:"",공급처:"",연료종류:""}
                 }
                 var usage_input = document.getElementById('water_usage_input').value
-                info_list.content = document.getElementById('carbon_emissions_content').value
+                info_list.CarbonActivity = document.getElementById('carbon_emissions_content_water').value
                 info_list.data =  usage_input+"/"+"m3"
                 info_list.emissions = usage_input + 4 + "kg" //탄소 배출량 계산식
                 info_list.StartDate = document.getElementById('start_data').value+'-01'
                 info_list.EndDate = document.getElementById('end_data').value+'-01'
-                
+                info_list.Division.운영주체 = main_agent.value
+                info_list.Division.건물명 = document.getElementById('building_name_text').value
+                info_list.Division.공급처 = 공급처.value
+
                 if(main_agent.value == '기업'){
                     info_list.scope = 1
                 }
@@ -88,7 +96,8 @@ import {ref} from 'vue'
             return {
                 click_regi_btn,
                 unit_s,
-                main_agent
+                main_agent,
+                공급처
             }
         }
     }

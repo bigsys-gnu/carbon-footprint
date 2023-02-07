@@ -52,7 +52,7 @@ export default {
       var columns= [
         {
           label: '탄소 배출 내용',
-          field: 'content',
+          field: 'CarbonActivity',
         },
         {
           label: '활동 데이터',
@@ -83,7 +83,7 @@ export default {
           field: 'scope',
         }
       ]
-      var rows = ref([{content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:"",category:""}])
+      var rows = ref([])
 
       function selectionChanged(params){
         text.value = params.selectedRows

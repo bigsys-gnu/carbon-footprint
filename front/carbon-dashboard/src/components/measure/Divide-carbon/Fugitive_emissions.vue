@@ -7,7 +7,7 @@
         </div>
         <div style="margin-top:50px; ">
             탄소 배출 내용<br>
-            <input type="text" class="addInfo_input" id="carbon_emissions_content">
+            <input type="text" class="addInfo_input" id="carbon_emissions_content_fugi">
         </div> 
         <div style="margin-top:30px">기간 설정
             <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true">
@@ -22,12 +22,12 @@
             
         </div>
         <div class="add_info_divide"> 냉매종류
-            <select class="addInfo_input" id="refrigerant_type" v-if="device=='냉장고'">
-                <option value="0">HFC-134a</option>
+            <select v-model="refriModel" class="addInfo_input" id="refrigerant_type" v-if="device=='냉장고'">
+                <option value="HFC-134a">HFC-134a</option>
             </select>
-            <select class="addInfo_input" id="refrigerant_type" v-else-if="device=='에어컨'">
-                <option value="0">R-407c</option>
-                <option value="1">R-410a</option>
+            <select v-model="iceModel" class="addInfo_input" id="refrigerant_type" v-else-if="device=='에어컨'">
+                <option value="R-407c">R-407c</option>
+                <option value="R-410a">R-410a</option>
             </select>
         </div>
         
@@ -87,28 +87,46 @@ import {useStore} from "vuex"
 import {ref,computed} from "vue"
     export default {
         name :"power_usage",
-        data() {
-            return{
-                device:'냉장고',
-                
-            }
-        },
         setup(){
             const store = useStore()
             var device =ref('냉장고')
+            var refriModel = ref('HFC-134a')
+            var iceModel = ref('R-407c')
             function click_regi_btn(){
-                var info_list={content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:1,category:"2",unit:"g"}
+                var info_list={
+                    Type:"2",
+                    DetailType:"",
+                    StartDate:"",
+                    EndDate:"",
+                    Location:"",
+                    scope:1,
+                    data:"",
+                    nums:0,
+                    emissions:"",
+                    Carbonunit:"g",
+                    CarbonActivity:"",
+                    kind:"",
+                    Division:{건물명:"",설비명:""},
+                }
                 var usage_input = document.getElementById('amount_refrigerant').value
-                info_list.content = document.getElementById('carbon_emissions_content').value
+                info_list.CarbonActivity = document.getElementById('carbon_emissions_content_fugi').value
                 info_list.data =  usage_input+"/g"
+                info_list.nums = document.getElementById('nun_installations').value
                 info_list.emissions = usage_input+4
                 info_list.StartDate = document.getElementById('start_data').value+'-01'
                 info_list.EndDate = document.getElementById('end_data').value+'-01'
+                if (device.value == '냉장고'){
+                    info_list.kind = refriModel.value
+                }
+                else if(device.value=='에어컨'){
+                    info_list.kind = iceModel.value
+                }
+                info_list.DetailType =  device.value
 
                 store.commit("SetTableContent",info_list)
             }
 
-            return{device,click_regi_btn}
+            return{device,click_regi_btn,refriModel,iceModel}
         }
     }
 </script>

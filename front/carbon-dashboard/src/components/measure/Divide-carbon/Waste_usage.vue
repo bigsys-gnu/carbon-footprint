@@ -6,7 +6,7 @@
     </div>
     <div style="margin-top:50px; ">
         탄소 배출 내용<br>
-        <input type="text" class="addInfo_input" id="carbon_emissions_content">
+        <input type="text" class="addInfo_input" id="carbon_emissions_content_waste">
     </div> 
     <div style="margin-top:30px">기간 설정
         <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true" style="margin-left:80px;">
@@ -41,9 +41,9 @@
         </select>
     </div>
     <div class="add_info_divide">배출 주체
-        <select class="addInfo_input" id="subject_emission">
-            <option value="0">대학 소유 및 운영</option>
-            <option value="1">직접 입력</option>
+        <select v-model="배출주체" class="addInfo_input" id="subject_emission">
+            <option value="대학 소유 및 운영">대학 소유 및 운영</option>
+            <option value="직접 입력">직접 입력</option>
         </select>
     </div>
     <div class="add_info_divide" >폐기물 배출량
@@ -101,37 +101,43 @@ import {ref} from 'vue'
             const store = useStore()
             var waste_treatment = ref('매립')
             var unit_value = ref('하수')
-
+            var 배출주체 = ref('대학 소유 및 운영')
             function click_regi_btn(){
-                var info_list = {
-                    content:"",
-                    data:"",
-                    emissions:"",
+                var info_list={
+                    Type:"10",
+                    DetailType:"",
                     StartDate:"",
                     EndDate:"",
+                    Location:"",
                     scope:1,
-                    category:"10",
-                    unit:"ton",
+                    data:"",
+                    emissions:"",
+                    Carbonunit:"ton",
+                    CarbonActivity:"",
                     kind:"",
-                    DetailType:"",
-                    Division:{배출주체:"", 건물명:""},
-                    CarbonAcitivity:""
+                    Division:{건물명:"",운영주체:"",공급처:"",연료종류:""}
                 }
                 var usage_input = document.getElementById('emissions').value
-                info_list.content = document.getElementById('carbon_emissions_content').value
+                info_list.CarbonActivity = document.getElementById('carbon_emissions_content_waste').value
                 info_list.data =  usage_input+"/"+"ton"
                 info_list.emissions = usage_input+4
                 info_list.StartDate = document.getElementById('start_data').value+'-01'
                 info_list.EndDate = document.getElementById('end_data').value+'-01'
-                info_list.DetailType = waste_treatment.value
-                info_list.Division.배출주체 =  document.getElementById('subject_emission').value
+                if (waste_treatment.value == '하폐수'){
+                    info_list.DetailType = unit_value.value
+                }
+                else{
+                    info_list.DetailType = waste_treatment.value
+                }
+                info_list.Division.운영주체 = 배출주체.value
                 info_list.Division.건물명 =  document.getElementById('building_name_text').value
                 store.commit("SetTableContent",info_list)
             }
             return {
                 waste_treatment,
                 unit_value,
-                click_regi_btn
+                click_regi_btn,
+                배출주체
             }
         }
     }

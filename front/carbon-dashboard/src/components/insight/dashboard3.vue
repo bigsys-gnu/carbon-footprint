@@ -20,7 +20,7 @@
         </div>
         <div class="dashboard" id="dashboard3_bottom">
             <span style="float:left; margin-left:8vw; color:#615B5B; font-weight: bolder;" >전체 </span>
-            <sapn style="color:#376B7C; margin-left:2vw; font-weight: bolder;">{{ scope1+scope3+scope2 }}kg</sapn>
+            <span style="color:#376B7C; margin-left:2vw; font-weight: bolder;">{{ scope1+scope3+scope2 }}kg</span>
         </div>
     </div>
     

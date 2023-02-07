@@ -28,9 +28,9 @@
                 
             </div>
             <div class="add_info_divide">공급처
-                <select class="addInfo_input" id="supplier_drop">
-                    <option value="0">한국전력공사</option>
-                    <option value="1">직접 입력</option>
+                <select v-model="공급처" class="addInfo_input" id="supplier_drop">
+                    <option value="한국전력공사">한국전력공사</option>
+                    <option value="직접 입력">직접 입력</option>
                 </select>
             </div>
             <div class="add_info_divide" >전력 사용량
@@ -148,15 +148,31 @@ import {ref,computed} from 'vue'
             var main_agent = ref('기업')
             var unit_s = ref('kwh')
             var input_regi = ref(0)
+            var 공급처 = ref('한국전력공사')
             function click_regi_btn(unit_s){
-                var info_list={content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:2, category:"7",unit:unit_s}
+                var info_list={
+                    Type:"7",
+                    DetailType:"전력",
+                    StartDate:"",
+                    EndDate:"",
+                    Location:"",
+                    scope:2,
+                    data:"",
+                    emissions:"",
+                    Carbonunit:unit_s,
+                    CarbonActivity:"",
+                    kind:"",
+                    Division:{건물명:"",운영주체:"",공급처:""}
+                }
                 var usage_input = document.getElementById('usage_input').value
-                info_list.content = document.getElementById('carbon_emissions_content').value
+                info_list.CarbonActivity = document.getElementById('carbon_emissions_content').value
                 info_list.data =  usage_input+"/"+unit_s
                 info_list.emissions = usage_input + 4 + "kg" //계산식
                 info_list.StartDate = document.getElementById('start_data').value+'-01'
                 info_list.EndDate = document.getElementById('end_data').value+'-01'
-
+                info_list.Division.건물명 = document.getElementById('building_name_text').value
+                info_list.Division.운영주체 = main_agent.value
+                info_list.Division.공급처 = 공급처.value
                 console.log(info_list.StartDate)
             
                 if(main_agent.value == '기업'){
@@ -167,12 +183,12 @@ import {ref,computed} from 'vue'
                 }
                 store.commit("SetTableContent",info_list)
             }
-            
             return{
                 unit_s,
                 main_agent,
                 input_regi,
-                click_regi_btn
+                click_regi_btn,
+                공급처
             }
         }
     }

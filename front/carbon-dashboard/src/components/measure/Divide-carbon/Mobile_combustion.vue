@@ -6,7 +6,7 @@
     </div>
     <div style="margin-top:50px; ">
         탄소 배출 내용<br>
-        <input type="text" class="addInfo_input" id="carbon_emissions_content">
+        <input type="text" class="addInfo_input" id="carbon_emissions_content_mobile">
     </div> 
     <div style="margin-top:30px">기간 설정
         <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true">
@@ -30,8 +30,8 @@
         </select>
     </div>
     <div class="add_info_divide">연료정보
-        <select v-model="unit_s" class="addInfo_input" id="fuel_info">
-            <option v-for = "fule in fule_info_list" :value="fule.unit">{{fule.name}}</option>
+        <select v-model="index" class="addInfo_input" id="fuel_info">
+            <option v-for = "fule in fule_info_list" :value="fule.index">{{fule.name}}</option>
         </select>
     </div>
     <div class="add_info_divide" >연료량
@@ -46,6 +46,7 @@
     <button class ="input2_regi_btn" id="add_info_regi_btn" @click="click_regi_btn(unit_s)">상단 정보 등록</button>
 </template>
 
+
 <style>
    
 </style>
@@ -58,25 +59,42 @@ import {ref,computed} from "vue"
         name :"power_usage",
         setup(){
             const store = useStore()
-            var unit_s = ref('L')
             var main_agent = ref('기업')
             var fule_info_list = [
-                {name: '희발유', unit:'L'},
-                {name: '경유', unit:'L'},
-                {name: 'LPG', unit:'L'},
-                {name: '등유', unit:'L'},
-                {name: '윤활유', unit:'L'},
-                {name: 'CNG', unit:'Nm^3'},
-                {name: 'LNG', unit:'Nm^3'},
+                {index:0, name: '휘발유', unit:'L'},
+                {index:1, name: '경유', unit:'L'},
+                {index:2,name: '도시가스', unit:'L'},
+                {index:2,name: '천연가스', unit:'L'},
+                {index:3,name: '등유', unit:'L'},
+                {index:4,name: '윤활유', unit:'L'},
+                {index:5,name: 'CNG', unit:'Nm^3'},
+                {index:6,name: 'LNG', unit:'Nm^3'},
             ]
+            var index = ref(0)
+            var unit_s = fule_info_list[index.value].unit
             function click_regi_btn(unit_s){
-                var info_list={content:"",data:"",emissions:"",StartDate:"",EndDate:"",scope:1 , category:"1" ,unit:unit_s}
+                var info_list={
+                    Type:"1",
+                    DetailType:"",
+                    StartDate:"",
+                    EndDate:"",
+                    Location:"",
+                    scope:1,
+                    data:"",
+                    emissions:"",
+                    Carbonunit:unit_s,
+                    CarbonActivity:"",
+                    kind:"",
+                    Division:{건물명:"",설비명:""},
+                }
                 var usage_input = document.getElementById('amount_fuel').value
-                info_list.content = document.getElementById('carbon_emissions_content').value
+                info_list.CarbonActivity = document.getElementById('carbon_emissions_content_mobile').value
                 info_list.data =  usage_input+"/"+unit_s
                 info_list.emissions = usage_input+4
                 info_list.StartDate = document.getElementById('start_data').value+'-01'
                 info_list.EndDate = document.getElementById('end_data').value+'-01'
+                info_list.DetailType = fule_info_list[index.value].name
+                info_list.Division.설비명 = document.getElementById('facility_name_input').value
                 if(main_agent.value == '기업'){
                     info_list.scope = 1
                 }
@@ -87,6 +105,7 @@ import {ref,computed} from "vue"
             }
             return{
                 unit_s,
+                index,
                 main_agent,
                 fule_info_list,
                 click_regi_btn

@@ -7,7 +7,7 @@
         </div>
         <div style="margin-top:50px; ">
             탄소 배출 내용<br>
-            <input type="text" class="addInfo_input" id="carbon_emissions_content">
+            <input type="text" class="addInfo_input" id="carbon_emissions_content_animal">
         </div> 
         <div style="margin-top:30px">기간 설정
             <input class = "date_btn" id = "start_data" type="month" data-placeholder="시작 날짜" required aria-required="true">
@@ -18,8 +18,8 @@
             <input type="text" class="addInfo_input" id ="building_name_input" placeholder="본관 앞 마당" style="margin-left:40px">
         </div>
         <div class="add_info_divide">동물 관리 방법
-            <select class="addInfo_input" id="operating_entity_input" style="margin-left:40px">
-                <option  v-for="animal in animal_care_list" :aria-busy="animal">{{animal}}</option>
+            <select v-model="care" class="addInfo_input" id="operating_entity_input" style="margin-left:40px">
+                <option  v-for="animal in animal_care_list" :value="animal">{{animal}}</option>
             </select>
             
         </div>
@@ -64,18 +64,18 @@ import {computed ,ref} from "vue"
         name :"power_usage",
         setup(){
             const store = useStore()
-            var detail = ref('젖소-육성우')
-            console.log(detail.value)
+            var detail = ref('육성우')
+            var care = ref('혐기성 늪')
             var animal_list = [
-                    '젖소-육성우',
-                    '젖소-착유우',
-                    '한육우-송아지',
-                    '한육우-번식우',
-                    '한육우-비육우',
+                    '육성우',
+                    '착유우',
+                    '송아지',
+                    '번식우',
+                    '비육우',
                     '돼지',
-                    '닭-산란계',
-                    '닭-육계',
-                    '닭-기타 닭',
+                    '산란계',
+                    '육계',
+                    '기타닭',
                     '면양',
                     '산양',
                     '말',
@@ -86,73 +86,48 @@ import {computed ,ref} from "vue"
                     '거위'
                 ]
             var animal_care_list = [
-                '혐기성 늪',
-                '액체/슬러리',
-                '고체 저장',
-                '건조 부지',
+                '혐기성늪',
+                '액체/슬러지',
+                '고체저장',
+                '건조부지',
                 '목장/방목',
-                '일일 살포',
+                '일일살포',
                 '소화조',
-                '연료로 사용'
+                '연료로사용'
             ]
             
             function click_regi_btn(){
-                var info_list = {
+                var info_list={
+                    Type:"5",
                     DetailType:"",
                     StartDate:"",
                     EndDate:"",
                     Location:"",
-                    scope:1, 
-                    usage:"",
-                    unit:"마리",
-                    category:"5",
-                    CarbonActivity:"",
-                    kind:"", 
-                    Division:{동물사육위치:""},
+                    scope:1,
+                    data:"",
                     emissions:"",
+                    Carbonunit:"마리",
+                    CarbonActivity:"",
+                    kind:"",
+                    Division:{동물사육위치:""},
                 }
 
                 var usage_input = document.getElementById('usage_input').value //사육두수
-                info_list.CarbonActivity = document.getElementById('carbon_emissions_content').value // 탄소 배출 내용
-                info_list.usage = document.getElementById('usage_input').value+"/마리" 
+                info_list.CarbonActivity = document.getElementById('carbon_emissions_content_animal').value // 탄소 배출 내용
+                info_list.data = document.getElementById('usage_input').value+"/마리" 
                 info_list.emissions= usage_input+4 // 계산된 탄소 배출량
                 info_list.StartDate = document.getElementById('start_data').value+'-01' // 시작날짜
                 info_list.EndDate = document.getElementById('end_data').value+'-01' //종료 날짜
-
+                info_list.kind = care.value //동물 관리 방법
                 info_list.Division.동물사육위치 = document.getElementById('building_name_input').value // 동물 사육 위치
-                var method = document.getElementById('operating_entity_input').value // 동물 관리 방법
-                if ( detail == '젖소-육성우' || '젖소-착유우'){
-                    info_list.DetailType = '젖소'
-                    if( detail == '젖소-착유우' ) {
-                        info_list.kind = '착유우'
-                    }
-                    info_list.kind = '육성우'
-                }
-                else if ( detail == '한육우-송아지' || '한육우-번식우' || '한육우-비육우'){
-                    info_list.DetailType = '한육우'
-                    if( detail == '한육우-송아지' ) {
-                        info_list.kind = '송아지'
-                    }
-                    else if ( detail == '번식우'){
-                        info_list.kind = '번식우'
-                    }
-                    info_list.kind="비육우"
-                }
-                else if ( detail = "닭-산란계" || "닭-육계" || "닭-기타닭"){
-                    if( detail == '닭-산란계' ) {
-                        info_list.kind = '산란계'
-                    }
-                    else if ( detail == '닭-육계'){
-                        info_list.kind = '육계'
-                    }
-                    info_list.kind="기타닭"
-                } // 가축 유형
-        
+                info_list.DetailType = detail.value
 
+                console.log(detail.value)
+                
                 console.log(info_list)
                 store.commit("SetTableContent",info_list)
             }
-            return{animal_list,animal_care_list,click_regi_btn,detail}
+            return{animal_list,animal_care_list,click_regi_btn,detail,care}
         },
         mounted(){
         }
