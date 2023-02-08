@@ -146,19 +146,18 @@ import axios from "axios";
 export default{ 
     name:'',
     components:{},
-    data(){
-        return{
-            sampleData:''
-        };
-    },
     setup(){
         const store = useStore(); //vuex 사용
         const Offpreview = () => store.commit("OffGroupPreview", );
         const OnTotalPreview = () => store.commit("OnGroupPreview", "total");
         const OnDetailPreview = () => store.commit("OnGroupPreview", "detail");
         const OnInfoPreview = () => store.commit("OnGroupPreview", "info");
+        var today = new Date();
+        var year = today.getFullYear()
 
-        const GroupName = "samsung";
+        var GroupName =ref("") 
+        GroupName= computed(() => store.state.group_tree_selected_company);
+
         var scope12CarbonEmission = ref(1);
         var scope3CarbonEmission = ref(7);
         var month = computed(() => store.state.insight_month+1);
@@ -169,7 +168,8 @@ export default{
             }
         }
         async function get_total_emission(){
-            await axios.get("Company/Preview/samsung/2023-0"+month.value+"-01/2023-0"+month.value+"-31",config).then(res => {
+            await axios.get("Company/Preview/"+store.state.group_tree_selected_company+"/"+year+"-01-01/"+year+"-12-31",config).then(res => {
+                console.log(res.data) 
                 scope12CarbonEmission.value = res.data.Scopes[0]+res.data.Scopes[1]
                 scope3CarbonEmission.value = res.data.Scopes[2]
             })

@@ -272,7 +272,7 @@ import { useRouter } from "vue-router";
            
             function click_register_table(){
                 console.log("등록되었습니다")
-                
+                router.push("/measure/input1")
                 var table = computed(()=> store.state.table)
                 var config = {
                     headers:{

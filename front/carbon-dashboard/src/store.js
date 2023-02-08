@@ -19,6 +19,7 @@ export default createStore({
         Group_tree :[],
         group_list:[],
         CheckedNode : "", //그룹 구조에 수정,삭제, 추가 기준 노드
+        group_tree_selected_company :"",
 
         insight_month : today.getMonth(),
         insight_year : today.getFullYear(),
@@ -82,8 +83,10 @@ export default createStore({
         OffEdit(state){
             state.EditGroups = false;
         },
-        OnGroupPreview(state,corrent){
+        OnGroupPreview(state,corrent,com){
             state.GroupPreview = corrent;
+            state.group_tree_selected_company = com;
+            
         },
         OffGroupPreview(state){
             state.GroupPreview = false;
@@ -97,8 +100,18 @@ export default createStore({
         SetGroupTree(state,arr){
           state.Group_tree = arr  
         },
+        group_tree_selected_company(state,item){
+            state.group_tree_selected_company=(item) 
+            
+        },
+
+
         AddGroupList(state,item){
-            state.group_list.push(item)  
+            if(item==1){
+                state.group_list=[]  //누적으로 추가 방지를 위한 초기화
+            }else{
+                state.group_list.push(item) 
+            }
         },
         insight_select_company(state,item){
             state.insight_selected_company=(item)  

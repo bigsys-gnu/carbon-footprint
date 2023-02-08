@@ -90,6 +90,11 @@ import PinchScrollZoom, { PinchScrollZoomEmitData } from "@coddicat/vue3-pinch-s
             const store = useStore(); //vuex 사용
             var AddisView = computed(() => store.state.EditGroups);
             var Preview = computed(() => store.state.GroupPreview);
+            
+
+            function init_list(){
+                store.commit("AddGroupList",1);
+          }
 
             var zoomer ={
                 scale: 1,
@@ -98,11 +103,10 @@ import PinchScrollZoom, { PinchScrollZoomEmitData } from "@coddicat/vue3-pinch-s
                 translateX: 0,
                 translateY: 0 
             }
-            return {AddisView,zoomer,Preview}
+            return {AddisView,zoomer,Preview,init_list}
         },
-
-        method:{
-
+        mounted(){
+            this.init_list()
         }
     };
 </script>

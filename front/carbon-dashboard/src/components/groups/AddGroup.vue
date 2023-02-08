@@ -65,7 +65,7 @@
 import { useStore } from "vuex";
 import TreeListVue from "../measure/Tree-list.vue";
 //import Tree from "vue3-treeview";
-import Tree from './AddGroupTree2.vue'
+import Tree from './AddGroupTree.vue'
 
 export default{ 
     name:'',

@@ -1,5 +1,5 @@
 <template>
-    <div class="group-tree-node" @click="Onpreview">
+    <div class="group-tree-node" @click="Onpreview()">
         <div class="group-tree-node-top">
             <span class="group-tree-node-GroupName">{{GroupName}}</span>
         </div>
@@ -144,11 +144,14 @@ export default{
         manager:String
     },
     setup(props){
+        const store = useStore();
         var level = props.level;
-        const GroupName = props.GroupName;
-
-        const store = useStore(); //vuex 사용
-        const Onpreview = () => store.commit("OnGroupPreview","total" );
+        var GroupName = props.GroupName;
+        function Onpreview(){
+            store.commit("OnGroupPreview","total")
+            store.commit("group_tree_selected_company",GroupName)
+            
+          }
         store.commit("AddGroupList",GroupName );
         return{GroupName,level,Onpreview}
     },
