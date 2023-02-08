@@ -1,7 +1,7 @@
-import { defineComponent, h, PropType } from 'vue'
-
+import { defineComponent, h, PropType,computed } from 'vue'
+import axios from "axios";
 import { Bar } from 'vue-chartjs'
-
+import { useStore } from "vuex";
 import {
   Chart as ChartJS,
   Title,
@@ -48,8 +48,9 @@ export default defineComponent({
     },
     
   },
-  setup(props) {
-    const chartData = {
+  async setup(props) {
+    const store = useStore();
+    var chartData = {
       labels: [
         '2021년','2022년','2023년'
       ],
@@ -109,6 +110,35 @@ export default defineComponent({
       },
     }
 
+    var today = new Date(); 
+    var year = computed(() => store.state.insight_year).value;
+
+    var config = {
+      headers:{
+        "Authorization":"Bearer"+" "+store.state.accessToken,
+        "Content-Type": "text/html; charset=utf-8"
+      }
+    }
+    async function get_total_emission_year(i){
+      await axios.get("Company/Preview/"+store.state.insight_selected_company+"/"+(year-i)+"-01-01/"+(year-i)+"-12-28",config).then(res => {
+            chartData.datasets[0].data[2-i] = res.data.Scopes[0]
+            chartData.datasets[1].data[2-i] = res.data.Scopes[1]
+            chartData.datasets[2].data[2-i] = res.data.Scopes[2]
+            console.log(store.state.insight_selected_company+"야기는 봙봙")
+            console.log(chartData.datasets[2-i].data)
+        })
+        .catch(error => {
+            console.log(error)
+            console.log("insight")
+        })
+        .finally(() => {
+          
+        })
+    }
+    for (var i =0;i<3;i++){
+      await get_total_emission_year(i)
+    }
+    chartData.labels = [year-2,year-1,year]
     return () =>
       h(Bar, {
         chartData,

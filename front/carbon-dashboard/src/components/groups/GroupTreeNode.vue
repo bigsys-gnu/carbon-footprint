@@ -149,10 +149,12 @@ export default{
 
         const store = useStore(); //vuex 사용
         const Onpreview = () => store.commit("OnGroupPreview","total" );
-
+        store.commit("AddGroupList",GroupName );
         return{GroupName,level,Onpreview}
     },
-    created(){},
+    created(){
+        
+    },
     mounted(){},
     unmounted(){},
     methods:{},

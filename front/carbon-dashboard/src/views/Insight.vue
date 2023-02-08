@@ -3,30 +3,34 @@
       <navigation class="navigation"/>
       <div class="contents">
           <insight_header/>
-          <div class="body" style="height:110vh">
+          <div class="body" style="height:110vh" :key="selected_company">
             <div style="float:right; margin-right:5vw; margin-top:0px;">
               <button :class="{date_btn_insight: category_dashboard_month,'non_date_insight': !category_dashboard_month }" @click="click_month()">월</button>
               <button :class="{date_btn_insight: category_dashboard_year,'non_date_insight': !category_dashboard_year}" @click="click_year()">년</button>
               <button :class="{date_btn_insight: history,'non_date_insight': !history}" style="font-size:1.2vh;" @click="click_3year()">최근 3년</button>
             </div>
-            <span style="font-size:24px; font-weight: bolder; color:#5A5A5A;">탄소배출량 전체보기</span><br>
+            <span style="font-size:24px; font-weight: bolder; color:#5A5A5A;">{{ selected_company }} - 탄소배출량</span><br>
             <span style ="font-size: 15px; color: #8D8D8D; margin-bottom:10px;">Carbon Emission Overview</span>
+            <select class="select_group" v-model="selected_company" @change="change_company()">
+              <option v-for="item in group_list" :key="item">{{item}}</option>
+              <div></div>
+            </select>
             
             <!-- 조직명, 전체 배출량, 총 탄소 배출량 대비 Scope 비율 -->
             <div>
               <dashboard1_nameVue></dashboard1_nameVue>
-              <dashboard1_totalEmissionVue :scope1="scope1" :scope2="scope2" :scope3="scope3"></dashboard1_totalEmissionVue>
+              <dashboard1_totalEmissionVue :key="rerender_signal"  :scope1="scope1" :scope2="scope2" :scope3="scope3"></dashboard1_totalEmissionVue>
               <dashboard1_scopeVue :scope1="scope1" :scope2="scope2" :scope3="scope3"></dashboard1_scopeVue>
               
             </div>
             <!-- 최근 3개년 히스토리 -->
             <div v-if="history==true" > 
               <div style="margin-top:30vh; width:76vw; text-align: center;">
-                <span class="date_info_btn"> ＜ </span>
+                <span class="date_info_btn" @click="click_back_year()"> ＜ </span>
                 <span class="date_info">최근 3개년 히스토리</span>
-                <span class="date_info_btn"> ＞ </span>
+                <span class="date_info_btn" @click="click_plus_year()"> ＞ </span><br>
               </div>
-              <dashboard2Vue></dashboard2Vue>
+              <dashboard2Vue :key="rerender_signal"></dashboard2Vue>
             </div>
             
             <!-- 월 그래프 -->
@@ -55,6 +59,13 @@
 
 
 <style>
+  .select_group{
+    margin-left:4vw;
+    text-align: center;
+    width:8vw;
+    height:1.5vw;
+    font-weight: bolder;
+  }
   .date_btn_insight{
     margin-right:0.5vw;
     width:4vw;
@@ -136,7 +147,10 @@ import { computed,ref } from "vue";
           var total_emission = ref(0)
           var rerender_signal = ref(0)
           var datail_emission_arr = ref([])
+          var group_list = computed(() => store.state.group_list).value
+          var selected_company = ref(group_list[0])
           
+
           function click_month(){
             console.log("월")
             category_dashboard_month.value = true
@@ -157,6 +171,7 @@ import { computed,ref } from "vue";
             history.value = true
             category_dashboard_month.value = false
             category_dashboard_year.value = false
+            rerender_signal.value +=1
           }
           function click_back_month(){
             store.commit("InsightAddM",-1);
@@ -178,7 +193,13 @@ import { computed,ref } from "vue";
             get_total_emission_year()
             
           }
-          
+          function change_company(){
+            store.commit("insight_select_company",selected_company.value);
+            console.log("11111111111111111111111111111111"+ store.state.insight_selected_company)
+            get_total_emission_month()
+            get_total_emission_year()
+          }
+
           
           var config = {
             headers:{
@@ -187,8 +208,8 @@ import { computed,ref } from "vue";
             }
           }
           async function get_total_emission_month(){
-              await axios.get("Company/Preview/samsung/"+year.value+"-"+month.value+"-01/"+year.value+"-"+month.value+"-28",config).then(res => {
-                    console.log(res.data)
+              await axios.get("Company/Preview/"+selected_company.value+"/"+year.value+"-"+month.value+"-01/"+year.value+"-"+month.value+"-28",config).then(res => {
+                    console.log(selected_company.value+"//comcomcomcom")
                     console.log("연월"+year.value+month.value)
                     scope1.value = res.data.Scopes[0]
                     scope2.value = res.data.Scopes[1]
@@ -199,14 +220,13 @@ import { computed,ref } from "vue";
                 })
                 .catch(error => {
                     console.log(error)
-                    console.log("insight")
                 })
                 .finally(() => {
                   rerender_signal.value +=1
                 })
             }
             async function get_total_emission_year(){
-              await axios.get("Company/Preview/samsung/"+year.value+"-01-01/"+year.value+"-12-28",config).then(res => {
+              await axios.get("Company/Preview/"+selected_company.value+"/"+year.value+"-01-01/"+year.value+"-12-28",config).then(res => {
                     console.log(res.data)
                     console.log("연월"+year.value)
                     scope1.value = res.data.Scopes[0]
@@ -218,7 +238,6 @@ import { computed,ref } from "vue";
                 })
                 .catch(error => {
                     console.log(error)
-                    console.log("insight")
                 })
                 .finally(() => {
                   rerender_signal.value +=1
@@ -226,7 +245,7 @@ import { computed,ref } from "vue";
             }
         return{history,category_dashboard_month,category_dashboard_year,month,year,scope1,scope2,scope3,
           click_month,click_year,click_3year,click_back_year,click_plus_year,get_total_emission_month,get_total_emission_year,
-          click_back_month,click_plus_month,datail_emission_arr,rerender_signal
+          click_back_month,click_plus_month,datail_emission_arr,rerender_signal,group_list,selected_company,change_company
         
         }
 

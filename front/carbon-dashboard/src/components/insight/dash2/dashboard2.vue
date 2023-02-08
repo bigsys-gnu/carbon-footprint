@@ -1,7 +1,15 @@
 <template>
-    <div class="dashboard" id="dashboard2">
-      <chart2 style="width:inherit; height: inherit; "></chart2>
-    </div>
+
+    <Suspense>
+      <template #default>
+        <div class="dashboard" id="dashboard2">
+          <chart2 :key=re style="width:inherit; height: inherit; "></chart2>
+        </div>
+      </template>
+      <template #fallback>
+        <div>Loading...</div>
+      </template>
+    </Suspense>
 </template>
 <style>
     #dashboard2{
@@ -23,9 +31,12 @@ import chart2 from './chart2';
       },
       data() {
         return{
-          
+          re:0
         }
 
+      },
+      mounted(){
+        
       }
   }
 </script>

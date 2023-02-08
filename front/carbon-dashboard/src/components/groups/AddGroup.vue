@@ -2,10 +2,20 @@
 <div class="addGroup">
     <span class="edit-group-title">조직도 편집</span>
     <button class="edit-group-title" id="addGroup_del" @click="OffEditGroup">X</button>
-    <div class="add-group-iinput">
-        
-        <Tree />
-    </div>
+
+    <Suspense>
+        <template #default>
+            <div class="add-group-iinput">  
+              <Tree />
+            </div>
+        </template>
+        <template #fallback>
+            <div>Loading...</div>
+        </template>
+    </Suspense>
+    <button class="add-group-add" @click="AddGroup">추가하기</button>
+    <button class="add-group-add" @click="EditGroup">수정하기</button>
+    <button class="add-group-add" @click="DellGroup">삭제하기</button>
     <button class="add-group-commit" @click="OffEditGroup">저장하기</button>
 </div>
 </template>
@@ -31,7 +41,7 @@
 .add-group-commit{
     float: left;
     margin:1.3vh;
-    width: 20VW;
+    width: 16VW;
     height: 3.5vh;
     background: #3DC984;
     border: none;
@@ -55,7 +65,7 @@
 import { useStore } from "vuex";
 import TreeListVue from "../measure/Tree-list.vue";
 //import Tree from "vue3-treeview";
-import Tree from './AddGroupTree.vue'
+import Tree from './AddGroupTree2.vue'
 
 export default{ 
     name:'',
@@ -66,7 +76,17 @@ export default{
     setup(){
         const store = useStore(); //vuex 사용
         const OffEditGroup = () => store.commit("OffEdit", );
-        return {OffEditGroup}
+        
+        function AddGroup(){
+            store.commit("InsightAddY",-1);
+        }
+        function EditGroup(){
+            store.commit("InsightAddY",-1);
+        }
+        function DellGroup(){
+            store.commit("InsightAddY",-1);
+        }
+        return {OffEditGroup,AddGroup,EditGroup,DellGroup}
     },
     created(){},
     mounted(){},

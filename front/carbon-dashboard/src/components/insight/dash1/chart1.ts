@@ -82,12 +82,7 @@ export default defineComponent({
     const store = useStore();
     var month = ref(computed(() => store.state.insight_month+1));
     var year = computed(() => store.state.insight_year);
-    const config = {
-      headers:{
-        Authorization:"Bearer"+" "+store.state.accessToken,
-        "Content-Type": "text/html; charset=utf-8",
-      }
-    }
+
     async function get_list(){  //prop으로 대체하기\
       var data = computed(() =>store.state.scopes).value
       if((data.reduce((a, b) => a + b, 0))!=0 ){

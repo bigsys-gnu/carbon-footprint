@@ -128,6 +128,8 @@ import { useRouter } from "vue-router";
               await axios.get("/Company/Organization/samsung",config).then(res => {
                     console.log(res.data)
                     treeData = res.data
+                    store.commit("SetGroupTree",res.data);
+                    store.dispatch('set_group_list',treeData);
                 })
                 .catch(error => {
                   alert("로그인 시간이 만료되었습니다.")

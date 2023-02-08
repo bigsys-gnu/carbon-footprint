@@ -172,8 +172,10 @@ export default {
               "Content-Type": "text/html; charset=utf-8",
             }
       }
+
+      var group_name = store.state.group_name
       async function get_data(){
-        await axios.get("/CarbonEmission/samsung",config).then(res => {
+        await axios.get("/CarbonEmission/"+group_name,config).then(res => {
               console.log(res.data)
               
               for(var i=0;i<res.data.length;i++){

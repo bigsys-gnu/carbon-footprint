@@ -33,7 +33,7 @@ export default{
           .then((res) => {
             alert("로그인에 성공했습니다.");
             store.commit("loginToken",res.data.AccessToken)
-            console.log("d"+store.state.accessToken)
+            console.log(JSON.stringify(res.data))
             router.push('/group');
           })
           .catch(() => {

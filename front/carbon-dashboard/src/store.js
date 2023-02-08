@@ -16,8 +16,13 @@ export default createStore({
         EditGroups : false,
         GroupPreview : false,
         EditTable : false,
+        Group_tree :[],
+        group_list:[],
+        CheckedNode : "", //그룹 구조에 수정,삭제, 추가 기준 노드
+
         insight_month : today.getMonth(),
-        insight_year : today.getFullYear(), 
+        insight_year : today.getFullYear(),
+        insight_selected_company :"", 
         detail_emission: [0,0,0,0,0,0,0,0,0,0,0,0,0],
         table:[],    //로컬 저장소 
         total_table:[], //저장 필요
@@ -25,6 +30,7 @@ export default createStore({
         selected_row:"",
         table_kind:"",
         group_name: "", //저장 필요
+
         //토큰 관련 
         accessToken: null,
         refreshToken: null,
@@ -87,6 +93,19 @@ export default createStore({
         },
         OffGroupInfo(state){
             state.infopage = false
+        },
+        SetGroupTree(state,arr){
+          state.Group_tree = arr  
+        },
+        AddGroupList(state,item){
+            state.group_list.push(item)  
+        },
+        insight_select_company(state,item){
+            state.insight_selected_company=(item)  
+        },
+
+        SetCheckedNode(state,node){
+            state.CheckedNode = node
         },
 
         InsightAddM(state,change){
@@ -203,7 +222,17 @@ export default createStore({
         logout: ({commit}) => { // 로그아웃
             commit('removeToken');
             location.reload();
-        }
+        },
+        // set_group_list: function (origin_json_list) {
+        //     var temp_list = []   
+            
+        //     while(origin_json_list != null){
+        //         temp_list.push(origin_json_list.lable)
+        //         origin_json_list = origin_json_list.Children
+        //     } 
+        //     console.log((temp_list)+"액션리스트")
+        //     return 
+        //   },
     },
     //상태 모듈화
     modules:{
