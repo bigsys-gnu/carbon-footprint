@@ -9,16 +9,16 @@
               <button :class="{date_btn_insight: category_dashboard_year,'non_date_insight': !category_dashboard_year}" @click="click_year()">년</button>
               <button :class="{date_btn_insight: history,'non_date_insight': !history}" style="font-size:1.2vh;" @click="click_3year()">최근 3년</button>
             </div>
-            <span style="font-size:24px; font-weight: bolder; color:#5A5A5A;">{{ selected_company }} - 탄소배출량</span><br>
-            <span style ="font-size: 15px; color: #8D8D8D; margin-bottom:10px;">Carbon Emission Overview</span>
             <select class="select_group" v-model="selected_company" @change="change_company()">
               <option v-for="item in group_list" :key="item">{{item}}</option>
-              <div></div>
             </select>
+            <span style="font-size:24px; font-weight: bolder; color:#5A5A5A;">{{ selected_company }} - 탄소배출량</span><br>
+            <span style ="font-size: 15px; color: #8D8D8D; margin-bottom:10px;">Carbon Emission Overview</span>
+            
             
             <!-- 조직명, 전체 배출량, 총 탄소 배출량 대비 Scope 비율 -->
             <div>
-              <dashboard1_nameVue></dashboard1_nameVue>
+              <dashboard1_nameVue :key="rerender_signal" ></dashboard1_nameVue>
               <dashboard1_totalEmissionVue :key="rerender_signal"  :scope1="scope1" :scope2="scope2" :scope3="scope3"></dashboard1_totalEmissionVue>
               <dashboard1_scopeVue :scope1="scope1" :scope2="scope2" :scope3="scope3"></dashboard1_scopeVue>
               
@@ -60,11 +60,16 @@
 
 <style>
   .select_group{
-    margin-left:4vw;
+    margin-right:2vw;
     text-align: center;
     width:8vw;
-    height:1.5vw;
+    height:2.2vw;
     font-weight: bolder;
+    float: right;
+    background: #FFFFFF;
+    border: 1px solid #CFCFCF;
+    border-radius: 1.1vh;
+
   }
   .date_btn_insight{
     margin-right:0.5vw;
@@ -135,7 +140,7 @@ import { computed,ref } from "vue";
           
       },
       setup() {
-        const store = useStore();
+          const store = useStore();
           var history = ref(false)
           var category_dashboard_month = ref(true)
           var category_dashboard_year= ref(false)
@@ -148,6 +153,7 @@ import { computed,ref } from "vue";
           var rerender_signal = ref(0)
           var datail_emission_arr = ref([])
           var group_list = computed(() => store.state.group_list).value
+          console.log("그룸",group_list)
           var selected_company = ref(group_list[0])
           
 
@@ -171,7 +177,10 @@ import { computed,ref } from "vue";
             history.value = true
             category_dashboard_month.value = false
             category_dashboard_year.value = false
-            rerender_signal.value +=1
+            setTimeout(function() {
+              rerender_signal.value +=1
+            }, 2000);
+            
           }
           function click_back_month(){
             store.commit("InsightAddM",-1);
@@ -252,6 +261,7 @@ import { computed,ref } from "vue";
       },
       created(){
         this.get_total_emission_month()
+        this.change_company()
       },  
   }
 </script>

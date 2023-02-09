@@ -104,17 +104,17 @@ import { computed } from "vue";
         const store = useStore();
         var month = computed(() => store.state.insight_month+1);
         var year = computed(() => store.state.insight_year);
-        var total='1,241'
+        var total='0'
         var DirectEnargyList=[
-              {label:"휘발유",weight:12.34},
-              {label:"경유",weight:11.32},
-              {label:"등유",weight:3.67},
-              {label:"LPG",weight:1.234},
-              {label:"도시가스(LNG)",weight:0.52},
+              {label:"휘발유",weight:0},
+              {label:"경유",weight:0},
+              {label:"등유",weight:0},
+              {label:"LPG",weight:0},
+              {label:"도시가스(LNG)",weight:0},
             ]
           var IndirectEnargyList=[
-              {label:"전력",weight:12.34},
-              {label:"열(스팀)",weight:11.32},
+              {label:"전력",weight:0},
+              {label:"열(스팀)",weight:0},
 
             ]
         return{month,year,total,DirectEnargyList,IndirectEnargyList}

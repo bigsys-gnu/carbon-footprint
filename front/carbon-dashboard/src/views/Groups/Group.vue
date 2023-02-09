@@ -1,7 +1,9 @@
 <template>
     <div class="group-main">
+        
         <navigation class="navigation"/>
         <div class="contents">
+            <AddPopup></AddPopup>
             <GroupHeader/>
             <!--  <PinchScrollZoom  ref="zoomer"       :translate-x="150"
       :translate-y="150" :width="1400" :height="800" :scale="scale"       @scaling="(e) => onEvent('scaling', e)"
@@ -71,7 +73,7 @@ import GroupAdd from "@/components/groups/AddGroup.vue"
 import GroupPreview from "@/components/groups/PreviewEmission"
 import GroupPreviewDetail from "@/components/groups/PreviewDetailEmission.vue"
 import GroupPreviewInfo from   "@/components/groups/PreviewInfo.vue"
-
+import AddPopup from "@/components/groups/AddPopup.vue"
 import PinchScrollZoom, { PinchScrollZoomEmitData } from "@coddicat/vue3-pinch-scroll-zoom";
 //import EditGroup from  "@/components/groups/Date.vue"
 
@@ -84,13 +86,14 @@ import PinchScrollZoom, { PinchScrollZoomEmitData } from "@coddicat/vue3-pinch-s
             GroupAdd,PinchScrollZoom,
             GroupPreview,
             GroupPreviewDetail,
-            GroupPreviewInfo
+            GroupPreviewInfo,
+            AddPopup
         },
         setup(){
             const store = useStore(); //vuex 사용
             var AddisView = computed(() => store.state.EditGroups);
             var Preview = computed(() => store.state.GroupPreview);
-            
+            var GroupAddBtn = computed(()=> store.state.GroupAddBtn);
 
             function init_list(){
                 store.commit("AddGroupList",1);
@@ -103,7 +106,7 @@ import PinchScrollZoom, { PinchScrollZoomEmitData } from "@coddicat/vue3-pinch-s
                 translateX: 0,
                 translateY: 0 
             }
-            return {AddisView,zoomer,Preview,init_list}
+            return {AddisView,zoomer,Preview,init_list,GroupAddBtn}
         },
         mounted(){
             this.init_list()

@@ -17,7 +17,9 @@ export default createStore({
         GroupPreview : false,
         EditTable : false,
         Group_tree :[],
+        GroupAddBtn : false,
         group_list:[],
+        depth:0,
         CheckedNode : "", //그룹 구조에 수정,삭제, 추가 기준 노드
         group_tree_selected_company :"",
 
@@ -104,8 +106,16 @@ export default createStore({
             state.group_tree_selected_company=(item) 
             
         },
-
-
+        SetGroupDepth(state,depth){
+            state.depth = depth
+        },
+        OnGroupAddPopup(state,group_name){
+            state.GroupAddBtn = true
+            state.group_name=group_name
+        },
+        OffGroupAddPopup(state){
+            state.GroupAddBtn = false
+        },
         AddGroupList(state,item){
             if(item==1){
                 state.group_list=[]  //누적으로 추가 방지를 위한 초기화

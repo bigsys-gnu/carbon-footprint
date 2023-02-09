@@ -60,18 +60,20 @@
 </style>
 
 <script>
+import { useStore } from "vuex";
+import { computed,ref } from "vue";
   export default {
       name :"dashboard1",
       components:{
       },
-      data() {
-        return{
-            group_name:'samsung',
-            기관명:'기업',
-            위치: '경남 진주시',
-            scope1:123.4
+      setup() {
+          const store = useStore();
+          var group_name = computed(() => store.state.insight_selected_company).value
+          var 기관명 = '기업'
+        var  위치 =  '경남 진주시'
+         var  scope1 = 123.4
+         return{group_name,기관명,위치,scope1}
         }
-      },
   }
 </script>
   

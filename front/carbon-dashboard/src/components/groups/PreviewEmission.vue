@@ -183,7 +183,7 @@ export default{
         }
         
 
-        var TotalEmission = scope3CarbonEmission.value + scope12CarbonEmission.value;
+        var TotalEmission = ref(scope3CarbonEmission.value + scope12CarbonEmission.value)
 
         return{Offpreview,GroupName,TotalEmission,scope12CarbonEmission,scope3CarbonEmission,
             OnTotalPreview,OnDetailPreview,OnInfoPreview,get_total_emission}

@@ -1,6 +1,6 @@
 <template>
     <div class="group-tree">
-      <button @click="change">조직설계 온오프</button> <!-- 임시 -->
+         <!-- 임시 -->
         <div v-if="IfTreeNull"><!-- 그룹이 없으면 보여줌 -->
           <img src="@/assets/LockGroup.png" alt="권한 따라 잠금" class="lock-group">
           <span class="group-lock-guide">회사 조직을 설계하세요</span>
