@@ -8,7 +8,7 @@
         <div class="select-preview-item" @click="OnInfoPreview">정보</div>
     </div>
     <div class="preview-text-groupname">{{GroupName}} 탄소 배출량</div>
-    <div class="preview-text-totalEmission">{{TotalEmission}}KG</div>
+    <div class="preview-text-totalEmission">{{scope12CarbonEmission+scope3CarbonEmission}}KG</div>
 
     <div class="preview-emission-list">
         <div>전체 대비 탄소 배출량 비율</div>

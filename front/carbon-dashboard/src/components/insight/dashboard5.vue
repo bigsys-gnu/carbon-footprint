@@ -12,7 +12,7 @@
       <div>
           <div v-for="item in DirectEnargyList" :key="item.label" class="emission-list-item" style="height:3.3vh; margin-top:1vh">
               <span class="emission-list-item-lable" style="font-size:1.8vh; height: 0vh; margin-left:1vw; padding: 0; color:#615B5B">{{item.label}}</span>
-              <span class="emission-list-item-wight" style="font-size:1.8vh; height: 0vh; margin-right:10vw; color:#000000; padding: 0; ">{{item.weight}} kg</span>
+              <span class="emission-list-item-wight" style="font-size:1.8vh; height: 0vh; margin-right:10vw; color:#000000; padding: 0; ">{{item.weight}} GJ</span>
           </div>
       </div>
     </div>
@@ -23,13 +23,13 @@
       <div>
           <div v-for="item in IndirectEnargyList" :key="item.label" class="emission-list-item" style="height:3.3vh; margin-top:1vh">
               <span class="emission-list-item-lable" style="font-size:1.8vh; height: 0vh; margin-left:1vw; padding: 0; color:#615B5B">{{item.label}}</span>
-              <span class="emission-list-item-wight" style="font-size:1.8vh; height: 0vh; margin-right:10vw; color:#000000; padding: 0; ">{{item.weight}} kg</span>
+              <span class="emission-list-item-wight" style="font-size:1.8vh; height: 0vh; margin-right:10vw; color:#000000; padding: 0; ">{{item.weight}} GJ</span>
           </div>
       </div>
     </div>
     <div class="dashboard" id="dashboard5_bottom"> 
       <span style="float:left; margin-left:6vw; color:#615B5B; font-weight: bolder;" >총 에너지 소비량 </span>
-      <span style="color:#376B7C; margin-left:-1.5vw; font-weight: bolder;">{{ total }}kg</span>
+      <span style="color:#376B7C; margin-left:-1.5vw; font-weight: bolder;">{{ total }}GJ</span>
     </div>
   </div>
     

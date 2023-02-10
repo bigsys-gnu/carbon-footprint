@@ -54,7 +54,7 @@ export default defineComponent({
       datasets: [
         {
           backgroundColor: ['#E0F599', '#62BC8A','#15575C'], 
-          data: [61.63064, 20,14],
+          data: [25,20,20],
           cutout:0,
           borderWidth:0
         }
@@ -78,15 +78,16 @@ export default defineComponent({
     }
     
     const router = useRouter();
-    //chart js 의 props 충돌 때문에 api 2번 호출로 설정 -> 수정되면 props 사용 권장
     const store = useStore();
     var month = ref(computed(() => store.state.insight_month+1));
     var year = computed(() => store.state.insight_year);
 
-    async function get_list(){  //prop으로 대체하기\
-      var data = computed(() =>store.state.scopes).value
-      if((data.reduce((a, b) => a + b, 0))!=0 ){
-        chartData.datasets[0].data = data
+    async function get_list(){
+      var data = ref(computed(() =>store.state.scopes).value)
+      if((data.value.reduce((a, b) => a + b, 0))!=0 ){
+        
+        chartData.datasets[0].data = data.value
+        console.log("3년치"+ data.value)
       }else{
         chartData.datasets[0].data = [2,1.4,1]
       }

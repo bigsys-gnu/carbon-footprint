@@ -125,11 +125,11 @@ export default defineComponent({
             chartData.datasets[0].data[2-i] = res.data.Scopes[0]
             chartData.datasets[1].data[2-i] = res.data.Scopes[1]
             chartData.datasets[2].data[2-i] = res.data.Scopes[2]
-            console.log(store.state.insight_selected_company)
-            console.log(chartData.datasets[2-i].data)
+          
+            console.log(JSON.stringify(res.data)+"체크")
             temp_arr[0] +=res.data.Scopes[0] //3년치 데이터 합산 
             temp_arr[1] +=res.data.Scopes[1]
-            temp_arr[2] +=res.data.Scopes[2]
+            temp_arr[2]  +=res.data.Scopes[2]
         })
         .catch(error => {
             console.log(error)
@@ -139,11 +139,13 @@ export default defineComponent({
           
         })
     }
+    temp_arr = [0,0,0]
     for (var i =0;i<3;i++){
-      temp_arr = [0,0,0]
       await get_total_emission_year(i)
-      store.commit("set_scopes",temp_arr);
     }
+    console.log(temp_arr+"뉴 어레이")
+    store.commit("set_scopes",temp_arr);
+
     chartData.labels = [year-2,year-1,year]
     return () =>
       h(Bar, {

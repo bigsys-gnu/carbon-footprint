@@ -23,13 +23,15 @@
 
 <script>
 import { ref } from "vue";
+import { useStore } from "vuex";
   export default {
       name :"dashboard1",
       components:{
       },
       setup(props) {
-
-        var total_emssion = ref(props.scope1+ props.scope2+props.scope3).value.toPrecision(8)
+        const store = useStore();
+        var total_emssion = ref(store.state.scopes[0]+store.state.scopes[1]+store.state.scopes[2]).value.toPrecision(8)
+        console.log("3suscl222")
         return{total_emssion
         }
       },

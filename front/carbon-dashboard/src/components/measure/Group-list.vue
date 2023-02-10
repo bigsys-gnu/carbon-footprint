@@ -13,12 +13,9 @@
                 <div :class="{list : titleclick}" v-if="titleclick == true">
                     <!-- 조직 목록 표시 -->
                     <ul class="list-list" style="list-style:none; font-weight:600 ; margin-right: 2vw;">
-                        <!-- number.category_title : 'n'차 카테고리 표시-->
                         <li style=" margin-bottom:5vh; font-size: 0.8vw; color: #3D3E3F;" v-for="number in list_number">{{number.category_title}}
                             <div v-for="category in list_category">
                             <li class="category_content" v-if="number.index == category.category" @click="select_category(category)">
-                                <!-- number.index ==1 이면 1차 카테고리를 나타냄 -->
-                                <!-- 조직목록 표시 -->
                                 <img style="margin-right:1.3vw; width: 3vw; vertical-align: middle;" src="@/assets/building.png" alt="" v-if="number.index==1">
                                 <h class ="category_image2" v-if="number.index!=1">{{category.image}}</h>{{category.name}}
                                 <img src="@/assets/check.png" alt="" style="width:1.5vw; margin: 1vw; float: right;" v-if="category.check==true">
@@ -213,12 +210,7 @@ import { ref,computed } from "vue"
                     {index:"3",category_title: "3차 카테고리"}
             ])
             var list_category = ref([
-                    {category:"1", image:'building.png' ,name:"경상대", check:''},
-                    {category:"2" ,image:'상', name:"상경대학", check:''}, 
-                    {category:"2" ,image:'공', name:"공과대학", check:''}, 
-                    {category:"3" ,image:'경', name:"경영학과", check:''},   
-                    {category:"3" ,image:'항', name:"항공우주 및 소프트웨어학과", check:''},
-                    {category:"3" ,image:'건', name:"건축공학과", check:''},                  
+                          
             ])
             var select_group = ref([
                     //{category:"2" ,image:'상', name:"상경대학"},

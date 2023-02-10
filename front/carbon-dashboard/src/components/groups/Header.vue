@@ -43,7 +43,7 @@
     max-height: 3vh;
     width: 10vw;
     margin-top: 1.5vh;
-    margin-left: 30vw;
+    margin-left: 28vw;
     text-align: left;
     background-color: white;
     border-radius: 5px;
@@ -68,7 +68,7 @@
 .add-group-button{
     float: left;
     margin:1.3vh;
-    width: 6.5vw;
+    width: 6vw;
     height: 3.5vh;
     background: #3DC984;
     border: none;
@@ -76,7 +76,7 @@
     font-weight: 600;
     font-size: 13px;
     color: #FFFFFF;
-    position:fixed;
+ 
 }
 </style>
 

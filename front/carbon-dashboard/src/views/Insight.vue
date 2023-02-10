@@ -20,7 +20,7 @@
             <div>
               <dashboard1_nameVue :key="rerender_signal" ></dashboard1_nameVue>
               <dashboard1_totalEmissionVue :key="rerender_signal"  :scope1="scope1" :scope2="scope2" :scope3="scope3"></dashboard1_totalEmissionVue>
-              <dashboard1_scopeVue :scope1="scope1" :scope2="scope2" :scope3="scope3"></dashboard1_scopeVue>
+              <dashboard1_scopeVue :key="rerender_signal" :scope1="scope1" :scope2="scope2" :scope3="scope3"></dashboard1_scopeVue>
               
             </div>
             <!-- 최근 3개년 히스토리 -->
@@ -177,9 +177,9 @@ import { computed,ref } from "vue";
             history.value = true
             category_dashboard_month.value = false
             category_dashboard_year.value = false
-            setTimeout(function() {
-              rerender_signal.value +=1
-            }, 2000);
+            // setTimeout(function() {
+            //   rerender_signal.value +=1
+            // }, 2000);
             
           }
           function click_back_month(){
@@ -190,6 +190,16 @@ import { computed,ref } from "vue";
           function click_plus_month(){
             store.commit("InsightAddM",1);
             get_total_emission_month()
+            
+          }
+          function click_back_year(){
+            store.commit("InsightAddY",-1);
+            get_total_emission_year()
+            
+          }
+          function click_plus_year(){
+            store.commit("InsightAddY",1);
+            get_total_emission_year()
             
           }
           function click_back_year(){
@@ -218,7 +228,7 @@ import { computed,ref } from "vue";
           }
           async function get_total_emission_month(){
               await axios.get("Company/Preview/"+selected_company.value+"/"+year.value+"-"+month.value+"-01/"+year.value+"-"+month.value+"-28",config).then(res => {
-                    console.log(selected_company.value+"//comcomcomcom")
+                    console.log(res.data)
                     console.log("연월"+year.value+month.value)
                     scope1.value = res.data.Scopes[0]
                     scope2.value = res.data.Scopes[1]
@@ -263,5 +273,8 @@ import { computed,ref } from "vue";
         this.get_total_emission_month()
         this.change_company()
       },  
+      mounted(){
+        this.rerender_signal +=1
+      }
   }
 </script>

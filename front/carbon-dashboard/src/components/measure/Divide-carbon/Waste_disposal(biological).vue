@@ -30,7 +30,7 @@
     </div>
     <div class="add_info_divide">처리방식
         <select v-model="processKind" class="addInfo_input" id="supplier_drop_steam">
-            <option value="사료화 퇴비화">사료화 퇴비화</option>
+            <option value="사료화 퇴비화">사료화퇴비화</option>
             <option value="혐기성소화">혐기성소화</option>
         </select>
     </div>
