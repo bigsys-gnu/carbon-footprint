@@ -1,4 +1,5 @@
 import json
+import datetime
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -21,6 +22,8 @@ from Swag import CarSwag
 class CarbonEmissionQuery(APIView):
 
     permission_classes = (IsAuthenticated,)  # 로그인 검증
+
+    year = datetime.date.__str__(datetime.date.today())[:4]
 
     @swagger_auto_schema(
         operation_summary="요청한 회사의 모든 탄소 배출원을 반환하는 Api",
@@ -160,7 +163,7 @@ class CarbonEmissionQuery(APIView):
                 CarbonData["CarbonData"]["TNOUT"],
                 CarbonData["CarbonData"]["R"],
             )
-        elif CarDetailType == "폐수":
+        elif CarType != "폐기물" and CarDetailType == "폐수":
             CarTrans = DataKind.CO2_EQ(
                 usage,
                 CarbonData["CarbonData"]["CODIN"],
@@ -190,8 +193,31 @@ class CarbonEmissionQuery(APIView):
         try:
             if type(TargetCom) == ComModel.Company:
                 func.CreateCarbon(
-                    CarbonData, CarTrans, usage, UserRoot, None, CarInfoTemp
+                    CarbonData, round(CarTrans, 4), usage, UserRoot, None, CarInfoTemp
                 )
+
+                if int(self.year) >= int(CarInfoTemp.EndDate[:4]):
+                    if CarInfoTemp.Scope == 1:
+                        TargetCom.Scope1 += func.DivideByMonthOrYear(
+                            CarInfoTemp.StartDate, CarInfoTemp.EndDate, CarTrans, 1
+                        )
+                    elif CarInfoTemp.Scope == 2:
+                        TargetCom.Scope2 += func.DivideByMonthOrYear(
+                            CarInfoTemp.StartDate, CarInfoTemp.EndDate, CarTrans, 1
+                        )
+                    elif CarInfoTemp.Scope == 3:
+                        TargetCom.Scope3 += func.DivideByMonthOrYear(
+                            CarInfoTemp.StartDate, CarInfoTemp.EndDate, CarTrans, 1
+                        )
+                    else:
+                        CarInfoTemp.delete()
+                        return Response(
+                            "Wrong Scope Num Entered",
+                            status=status.HTTP_406_NOT_ACCEPTABLE,
+                        )
+
+                    TargetCom.save()
+
             else:
                 func.CreateCarbon(
                     CarbonData,
@@ -201,6 +227,30 @@ class CarbonEmissionQuery(APIView):
                     TargetCom,
                     CarInfoTemp,
                 )
+
+                if int(self.year) >= int(CarInfoTemp.EndDate[:4]):
+
+                    if CarInfoTemp.Scope == 1:
+                        TargetCom.SelfCom.Scope1 += func.DivideByMonthOrYear(
+                            CarInfoTemp.StartDate, CarInfoTemp.EndDate, CarTrans, 1
+                        )
+                    elif CarInfoTemp.Scope == 2:
+                        TargetCom.Scope2 += func.DivideByMonthOrYear(
+                            CarInfoTemp.StartDate, CarInfoTemp.EndDate, CarTrans, 1
+                        )
+                    elif CarInfoTemp.Scope == 3:
+                        TargetCom.SelfCom.Scope3 += func.DivideByMonthOrYear(
+                            CarInfoTemp.StartDate, CarInfoTemp.EndDate, CarTrans, 1
+                        )
+                    else:
+                        CarInfoTemp.delete()
+                        return Response(
+                            "Wrong Scope Num Entered",
+                            status=status.HTTP_406_NOT_ACCEPTABLE,
+                        )
+
+                    TargetCom.SelfCom.save()
+
         except KeyError:
             return Response("Wrong Carbon Data", status=status.HTTP_410_GONE)
 

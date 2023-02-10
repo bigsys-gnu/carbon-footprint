@@ -47,9 +47,15 @@ class CompanyQuery(APIView):
 
         # 요청한 회사가 루트인 경우 첫번째 자회사의 BelongCom이 None이므로 달라져야 함.
         if ComId.id == UserRoot.id:
-            func.getStruct(UserRoot, None, result)
+            Trans = [0, 0, 0]
+            func.getStruct(UserRoot, None, result, Trans)
         else:
-            func.getStruct(UserRoot, ComId, result)
+            Trans = [0, 0, 0]
+            func.getStruct(UserRoot, ComId, result, Trans)
+
+        result["Scope1"] = Trans[0]
+        result["Scope2"] = Trans[1]
+        result["Scope3"] = Trans[2]
 
         return Response(result, status=status.HTTP_200_OK)
 
@@ -123,6 +129,7 @@ class PreviewQuery(APIView):
         start, end 입력 예시) /2001-10-15/2002-10-15
         """
 
+        print(start, end)
         # 요청한 user의 모회사 확인
         UserRoot = func.GetUserRoot(request)
 
@@ -145,15 +152,37 @@ class PreviewQuery(APIView):
         start = func.AddZero(start)
         end = func.AddZero(end)
 
+        # 연단위 인사이트 요청인지 월단위 인사이트 요청인지 확인
+        if (
+            func.diff_month(
+                datetime.strptime(end, "%Y-%m-%d"),
+                datetime.strptime(start, "%Y-%m-%d"),
+            )
+            >= 11
+        ):
+            MorY = 1
+        else:
+            MorY = 0
+
+        print(start, end, "aaa")
+
         Carbons = []
         for depart in Departs:
             try:
-                temp = CarModel.Carbon.objects.filter(
-                    BelongDepart=depart,
-                    CarbonInfo__StartDate__gte=datetime.strptime(start, "%Y-%m-%d"),
-                    CarbonInfo__EndDate__lte=datetime.strptime(end, "%Y-%m-%d"),
-                )
-                Carbons.append(temp)
+                if MorY == 0:
+                    temp = CarModel.Carbon.objects.filter(
+                        BelongDepart=depart,
+                        CarbonInfo__StartDate__lte=datetime.strptime(start, "%Y-%m-%d"),
+                        CarbonInfo__EndDate__gte=datetime.strptime(end, "%Y-%m-%d"),
+                    )
+                    Carbons.append(temp)
+                else:
+                    temp = CarModel.Carbon.objects.filter(
+                        BelongDepart=depart,
+                        CarbonInfo__StartDate__lte=datetime.strptime(start, "%Y-%m-%d"),
+                        CarbonInfo__EndDate__gte=datetime.strptime(end, "%Y-%m-%d"),
+                    )
+                    Carbons.append(temp)
             except ValueError:  # 날짜가 범위를 초과한 경우 ex) 1월 35일
                 return Response(
                     "Date out of range", status=status.HTTP_406_NOT_ACCEPTABLE
@@ -166,12 +195,39 @@ class PreviewQuery(APIView):
 
         if IsRoot == 1:  # 요청한 데이터가 루트인 경우 depart가 아니라 데이터를 가져오지 못하므로 따로 가져옴
             try:
-                temp = CarModel.Carbon.objects.filter(
-                    BelongDepart=None,
-                    CarbonInfo__StartDate__gte=datetime.strptime(start, "%Y-%m-%d"),
-                    CarbonInfo__EndDate__lte=datetime.strptime(end, "%Y-%m-%d"),
-                )
-                Carbons.append(temp)
+                if MorY == 0:
+                    temp = CarModel.Carbon.objects.filter(
+                        BelongDepart=None,
+                        CarbonInfo__StartDate__lte=datetime.strptime(start, "%Y-%m-%d"),
+                        CarbonInfo__EndDate__gte=datetime.strptime(end, "%Y-%m-%d"),
+                    )
+                    Carbons.append(temp)
+                else:
+                    temp = (
+                        CarModel.Carbon.objects.filter(
+                            BelongDepart=None,
+                            CarbonInfo__StartDate__gte=datetime.strptime(
+                                start, "%Y-%m-%d"
+                            ),
+                            CarbonInfo__EndDate__lte=datetime.strptime(end, "%Y-%m-%d"),
+                        )
+                        | CarModel.Carbon.objects.filter(
+                            BelongDepart=None,
+                            CarbonInfo__EndDate__range=(
+                                datetime.strptime(start, "%Y-%m-%d"),
+                                datetime.strptime(end, "%Y-%m-%d"),
+                            ),
+                        )
+                        | CarModel.Carbon.objects.filter(
+                            BelongDepart=None,
+                            CarbonInfo__StartDate__range=(
+                                datetime.strptime(start, "%Y-%m-%d"),
+                                datetime.strptime(end, "%Y-%m-%d"),
+                            ),
+                        )
+                    )
+                    Carbons.append(temp)
+
             except ValueError:  # 날짜가 범위를 초과한 경우 ex) 1월 35일
                 return Response(
                     "Date out of range", status=status.HTTP_406_NOT_ACCEPTABLE
@@ -180,15 +236,21 @@ class PreviewQuery(APIView):
         for car in Carbons:
             for each in car:
                 TempScope = each.CarbonInfo.Scope
+                DivideScope = func.DivideByMonthOrYear(
+                    each.CarbonInfo.StartDate.strftime("%Y-%m-%d"),
+                    each.CarbonInfo.EndDate.strftime("%Y-%m-%d"),
+                    each.CarbonTrans,
+                    MorY,
+                )
                 if TempScope == 1:
-                    scope1 += each.CarbonTrans
+                    scope1 += DivideScope
                 elif TempScope == 2:
-                    scope2 += each.CarbonTrans
+                    scope2 += DivideScope
                 elif TempScope == 3:
-                    scope3 += each.CarbonTrans
+                    scope3 += DivideScope
 
                 TempCate = each.CarbonInfo.Category
-                categories[TempCate] += each.CarbonTrans
+                categories[TempCate] += DivideScope
 
         ans = {
             "Name": Depart,
@@ -354,9 +416,12 @@ class PreviewInfoQuery(APIView):
         except HuModel.Employee.DoesNotExist:
             Admin = None
 
-        BelongCom = ComModel.Department.objects.get(
-            RootCom=UserRoot, DepartmentName=Depart
-        )
+        if Depart == UserRoot.ComName:
+            BelongCom = None
+        else:
+            BelongCom = ComModel.Department.objects.get(
+                RootCom=UserRoot, DepartmentName=Depart
+            )
 
         SelfCom = ComModel.Company.objects.create(
             ComName=ComData["ComName"],
@@ -370,13 +435,22 @@ class PreviewInfoQuery(APIView):
             Location=ComData["Location"],
         )
 
-        ans = ComModel.Department.objects.create(
-            DepartmentName=ComData["DepartmentName"],
-            RootCom=UserRoot,
-            BelongCom=BelongCom.SelfCom,
-            SelfCom=SelfCom,
-            Depth=ComData["Depth"],
-        )
+        if BelongCom == None:
+            ans = ComModel.Department.objects.create(
+                DepartmentName=ComData["DepartmentName"],
+                RootCom=UserRoot,
+                BelongCom=BelongCom,
+                SelfCom=SelfCom,
+                Depth=ComData["Depth"],
+            )
+        else:
+            ans = ComModel.Department.objects.create(
+                DepartmentName=ComData["DepartmentName"],
+                RootCom=UserRoot,
+                BelongCom=BelongCom.SelfCom,
+                SelfCom=SelfCom,
+                Depth=ComData["Depth"],
+            )
 
         ans = ComSerial.DepartmentSerializer(ans)
         return Response(ans.data, status=status.HTTP_200_OK)

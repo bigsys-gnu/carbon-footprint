@@ -32,9 +32,9 @@ def CreateSamsung():
     )
     ComModel.Company.objects.create(
         ComName="삼성전자",
-        Scope1=0,
-        Scope2=0,
-        Scope3=0,
+        Scope1=1,
+        Scope2=2,
+        Scope3=3,
         Chief=HuModel.Employee.objects.get(Name="이재용"),
     )
     ComModel.Department.objects.create(
@@ -46,9 +46,9 @@ def CreateSamsung():
     )
     ComModel.Company.objects.create(
         ComName="삼성생명",
-        Scope1=0,
-        Scope2=0,
-        Scope3=0,
+        Scope1=1,
+        Scope2=2,
+        Scope3=3,
         Chief=HuModel.Employee.objects.get(Name="이재용"),
     )
     ComModel.Department.objects.create(
@@ -60,9 +60,9 @@ def CreateSamsung():
     )
     ComModel.Company.objects.create(
         ComName="삼성디스플레이",
-        Scope1=0,
-        Scope2=0,
-        Scope3=0,
+        Scope1=1,
+        Scope2=2,
+        Scope3=3,
         Chief=HuModel.Employee.objects.get(Name="이재용"),
     )
     ComModel.Department.objects.create(
@@ -75,7 +75,7 @@ def CreateSamsung():
     CarModel.CarbonInfo.objects.create(
         id=1,
         StartDate=datetime.date(2023, 1, 1),
-        EndDate=datetime.date(2023, 1, 31),
+        EndDate=datetime.date(2023, 3, 31),
         Location="진주",
         Scope=1,
         Category=12,
@@ -131,7 +131,7 @@ def CreateSamsung():
         StartDate=datetime.date(2022, 1, 1),
         EndDate=datetime.date(2023, 1, 1),
         Location="진주",
-        Scope=2,
+        Scope=1,
         Category=1,
     )
     CarModel.Carbon.objects.create(
@@ -141,7 +141,7 @@ def CreateSamsung():
         CarbonUnit="kg",
         CarbonTrans=20.0,
         RootCom=ComModel.Company.objects.get(ComName="samsung"),
-        BelongDepart=ComModel.Department.objects.get(DepartmentName="삼성생명"),
+        BelongDepart=None,
         CarbonInfo=CarModel.CarbonInfo.objects.get(id=4),
     )
     CarModel.CarbonInfo.objects.create(
