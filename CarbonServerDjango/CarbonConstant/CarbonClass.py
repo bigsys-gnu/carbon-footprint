@@ -150,8 +150,11 @@ class UreaFert(Fertilizer):
 
 
 class NitroFert(Fertilizer):  # 질문 후 작성
-    def CO2_EQ(self):
-        return super().CO2_EQ()
+    def CO2_EQ(self, usage, Fert):
+        N2O = (usage + Fert) * self.질소질비료_EF * 44 / 28
+
+        ans = N2O * 310
+        return ans
 
 
 class Forest:
@@ -373,6 +376,106 @@ class Turkey_Duck_Goose_OtherChicken(Animal):
     }
 
 
-# 폐기물처리시설 매립
-class WasteFacil:
+# 폐기물처리시설 소각
+class Burning:
+    OF = 1
+    N2O_EF = None
+
+    BurningTech = {
+        "연속식 - 고정상": 0.0002,
+        "연속식 - 유동상": 0,
+        "준연속식 - 고정상": 0.006,
+        "준연속식 - 유동상": 0.188,
+        "회분식(배치형) - 고정상": 0.06,
+        "회분식(배치형) - 유동상": 0.237,
+    }
+
+    def __init__(self, dm, CF, FCF):
+        self.dm = dm
+        self.CF = CF
+        self.FCF = FCF
+
+    def CO2_EQ(self, usage, kind):
+
+        CO2 = usage
+
+        if self.dm != None:
+            CO2 *= self.dm
+        if self.CF != None:
+            CO2 *= self.CF
+        if self.FCF != None:
+            CO2 *= self.FCF
+
+        CO2 = CO2 * self.OF * 44 / 12
+
+        CH4 = usage * self.BurningTech[kind] * (10**-3)
+        N2O = usage * self.N2O_EF * (10**-3)
+
+        ans = CO2 + CH4 * 21 + N2O * 310
+
+        return ans
+
+
+class BurningIndividual(Burning):
+    N2O_EF = 39.8
+
+
+class BurningCom(Burning):
+    N2O_EF = 113.19
+
+
+class BurningComSludge(Burning):
+    N2O_EF = 408.41
+
+
+class BurningComWaste(Burning):
+    N2O_EF = 113.19
+
+
+# 하수처리
+class FoulWater:
+    CH4_EF = 0.01532
+    N2O_EF = 0.005
+
+    def CO2_EQ(self, usage, BODIN, BODOUT, TNIN, TNOUT, R):
+        CH4 = ((BODIN - BODOUT) * (10**-3) * usage * self.CH4_EF - R) * (10**-3)
+        N2O = (TNIN - TNOUT) * usage * self.N2O_EF * 44 / 28 * (10**-6)
+
+        return CH4 * 21 + N2O * 310
+
+
+# 폐수처리
+class WaterWaste:
+    EF = 0.2
+
+    def CO2_EQ(self, usage, CODIN, CODOUT, R):
+        CH4 = ((CODIN - CODOUT) * usage * self.EF - R) * (10**-6)
+
+        return CH4 * 21
+
+
+# 생물학적
+class BioWaste:
+
+    BioDicCH4 = {
+        "퇴비화": {"건량": 10, "습량": 4, "배출계수": 4},
+        "혐기성소화": {"건량": 2, "습량": 1, "배출계수": 4},
+    }
+    BioDicN2O = {
+        "퇴비화": {"건량": 0.6, "습량": 0.3, "배출계수": 0.3},
+        "혐기성소화": {"건량": 0, "습량": 0, "배출계수": 0.3},
+    }
+
+    def CO2_EQ(self, usage, ProcessKind, ProcessType, R):
+        self.CH4_EFI = self.BioDicCH4[ProcessKind][ProcessType]
+        self.N2O_EFI = self.BioDicN2O[ProcessKind][ProcessType]
+
+        CH4 = usage * self.CH4_EFI * (10**-3) - R
+        N2O = usage * self.N2O_EFI * (10**-3) - R
+
+        return CH4 * 21 + N2O * 310
+
+
+# 매립
+class Digging:
     pass

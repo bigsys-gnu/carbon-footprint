@@ -132,7 +132,11 @@ class CarbonEmissionQuery(APIView):
         ]
 
         # 입력값에 따라 사용할 수식과 클래스가 변화하기 때문에 그에 맞게 다른 입력값 입력
-        if CarDetailType in CarbonDef.CarbonCateMap["산림에의한흡수"]:
+        if (
+            CarDetailType in CarbonDef.CarbonCateMap["산림에의한흡수"]
+            or CarDetailType in CarbonDef.CarbonCateMap["폐기물처리시설(소각)"]
+            or CarDetailType == "석회질비료"
+        ):
             CarTrans = DataKind.CO2_EQ(
                 usage,
                 CarbonData["CarbonData"]["kind"],
@@ -147,6 +151,34 @@ class CarbonEmissionQuery(APIView):
             CarTrans = DataKind.CO2_EQ(usage, CarbonData["CarbonData"]["nums"])
         elif CarDetailType in CarbonDef.CarbonCateMap["대학소유동물"]:
             CarTrans = DataKind.CO2_EQ(CarbonData["CarbonData"]["kind"], usage)
+        elif CarDetailType == "하수처리":
+            CarTrans = DataKind.CO2_EQ(
+                usage,
+                CarbonData["CarbonData"]["BODIN"],
+                CarbonData["CarbonData"]["BODOUT"],
+                CarbonData["CarbonData"]["TNIN"],
+                CarbonData["CarbonData"]["TNOUT"],
+                CarbonData["CarbonData"]["R"],
+            )
+        elif CarDetailType == "폐수":
+            CarTrans = DataKind.CO2_EQ(
+                usage,
+                CarbonData["CarbonData"]["CODIN"],
+                CarbonData["CarbonData"]["CODOUT"],
+                CarbonData["CarbonData"]["R"],
+            )
+        elif CarDetailType == "생물학적":
+            CarTrans = DataKind.CO2_EQ(
+                usage,
+                CarbonData["CarbonData"]["ProcessKind"],
+                CarbonData["CarbonData"]["ProcessType"],
+                CarbonData["CarbonData"]["R"],
+            )
+        elif CarDetailType == "질소질비료":
+            CarTrans = DataKind.CO2_EQ(
+                usage,
+                CarbonData["CarbonData"]["Fert"],
+            )
         else:
             CarTrans = DataKind.CO2_EQ(usage)
 
