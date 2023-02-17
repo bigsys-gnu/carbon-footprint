@@ -129,7 +129,6 @@ class PreviewQuery(APIView):
         start, end 입력 예시) /2001-10-15/2002-10-15
         """
 
-        print(start, end)
         # 요청한 user의 모회사 확인
         UserRoot = func.GetUserRoot(request)
 
@@ -140,13 +139,15 @@ class PreviewQuery(APIView):
         except ComModel.Department.DoesNotExist:
             HeadDepart = UserRoot
 
-        Departs = [HeadDepart]
         IsRoot = 0
         # 요청한 회사가 루트인 경우 첫번째 자회사의 BelongCom이 None이므로 달라져야 함.
         if type(HeadDepart) == ComModel.Company:
+            Departs = []
             func.getChildDepart(UserRoot, None, Departs)
             IsRoot = 1
+
         else:
+            Departs = [HeadDepart]
             func.getChildDepart(UserRoot, HeadDepart.SelfCom, Departs)
 
         start = func.AddZero(start)
@@ -173,7 +174,7 @@ class PreviewQuery(APIView):
                         CarbonInfo__StartDate__lte=datetime.strptime(start, "%Y-%m-%d"),
                         CarbonInfo__EndDate__gte=datetime.strptime(end, "%Y-%m-%d"),
                     )
-                    Carbons.append(temp)
+                    Carbons.extend([i for i in temp])
                 else:
                     temp = (
                         CarModel.Carbon.objects.filter(
@@ -198,7 +199,7 @@ class PreviewQuery(APIView):
                             ),
                         )
                     )
-                    Carbons.append(temp)
+                    Carbons.extend([i for i in temp])
             except ValueError:  # 날짜가 범위를 초과한 경우 ex) 1월 35일
                 return Response(
                     "Date out of range", status=status.HTTP_406_NOT_ACCEPTABLE
@@ -217,7 +218,7 @@ class PreviewQuery(APIView):
                         CarbonInfo__StartDate__lte=datetime.strptime(start, "%Y-%m-%d"),
                         CarbonInfo__EndDate__gte=datetime.strptime(end, "%Y-%m-%d"),
                     )
-                    Carbons.append(temp)
+                    Carbons.extend([i for i in temp])
                 else:
                     temp = (
                         CarModel.Carbon.objects.filter(
@@ -242,7 +243,7 @@ class PreviewQuery(APIView):
                             ),
                         )
                     )
-                    Carbons.append(temp)
+                    Carbons.extend([i for i in temp])
 
             except ValueError:  # 날짜가 범위를 초과한 경우 ex) 1월 35일
                 return Response(
@@ -250,23 +251,22 @@ class PreviewQuery(APIView):
                 )
 
         for car in Carbons:
-            for each in car:
-                TempScope = each.CarbonInfo.Scope
-                DivideScope = func.DivideByMonthOrYear(
-                    each.CarbonInfo.StartDate.strftime("%Y-%m-%d"),
-                    each.CarbonInfo.EndDate.strftime("%Y-%m-%d"),
-                    each.CarbonTrans,
-                    MorY,
-                )
-                if TempScope == 1:
-                    scope1 += DivideScope
-                elif TempScope == 2:
-                    scope2 += DivideScope
-                elif TempScope == 3:
-                    scope3 += DivideScope
+            TempScope = car.CarbonInfo.Scope
+            DivideScope = func.DivideByMonthOrYear(
+                car.CarbonInfo.StartDate,
+                car.CarbonInfo.EndDate,
+                car.CarbonTrans,
+                MorY,
+            )
+            if TempScope == 1:
+                scope1 += DivideScope
+            elif TempScope == 2:
+                scope2 += DivideScope
+            elif TempScope == 3:
+                scope3 += DivideScope
 
-                TempCate = each.CarbonInfo.Category
-                categories[TempCate] += DivideScope
+            TempCate = car.CarbonInfo.Category
+            categories[TempCate] += DivideScope
 
         ans = {
             "Name": Depart,
