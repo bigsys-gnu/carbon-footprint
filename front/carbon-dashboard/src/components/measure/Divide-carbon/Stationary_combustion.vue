@@ -27,24 +27,25 @@
         <select v-model="index" class="addInfo_input" id="fuel_info">
             <option v-for = "fule in fule_info_list" :value="fule.index">{{fule.name}}</option>
         </select>
+        
     </div>
     <div class="add_info_divide" >연료량
         <input class="addInfo_input" id="amount_fuel" placeholder="12,456">
-        <select class="addInfo_input" id="power_usage_drop" v-if="unit_s=='kg'">
+        <select class="addInfo_input" id="power_usage_drop" v-if="fule_info_list[index-1].unit=='kg'">
             <option value="0">kg</option>
         </select>
-        <select class="addInfo_input" id="power_usage_drop" v-else-if="unit_s=='L'">
+        <select class="addInfo_input" id="power_usage_drop" v-else-if="fule_info_list[index-1].unit=='L'">
             <option value="1">L</option>
         </select>
-        <select class="addInfo_input" id="power_usage_drop" v-else-if="unit_s=='Nm^3'">
+        <select class="addInfo_input" id="power_usage_drop" v-else-if="fule_info_list[index-1].unit=='Nm^3'">
             <option value="2">Nm^3</option>
         </select>
-        <select class="addInfo_input" id="power_usage_drop" v-else-if="unit_s=='kWh'">
+        <select class="addInfo_input" id="power_usage_drop" v-else-if="fule_info_list[index-1].unit=='kWh'">
             <option value="3">kWh</option>
         </select>
         
     </div>
-    <button class ="input2_regi_btn" id="add_info_regi_btn" @click="click_regi_btn(unit_s)">상단 정보 등록</button>
+    <button class ="input2_regi_btn" id="add_info_regi_btn" @click="click_regi_btn(fule_info_list[index-1].unit)">상단 정보 등록</button>
 </template>
 
 <style>
@@ -103,21 +104,23 @@ import { isTSAnyKeyword } from '@babel/types'
                     {index:10, name: '부탄', unit:'kg'},
                     {index:11, name: '나프타',unit:'L'},
                     {index:12, name: '용제',unit:'L'},
-                    {index:13, name: '항공유',unit:'L'},
-                    {index:14, name: '아스팔트',unit:'kg'},
-                    {index:15, name: '윤활유',unit:'L'},
-                    {index:16, name: '석유코크',unit:'kg'},
-                    {index:17, name: '부생연료1호',unit:'L'},
-                    {index:18, name: '부생연료2호',unit:'L'},
-                    {index:19, name: '천연가스(LNG)',unit:'kg'},
-                    {index:20, name: '도시가스(LNG)',unit:'Nm^3'},
-                    {index:21, name: '도시가스(LPG)',unit:'Nm^3'},
-                    {index:22, name: '국내무연탄',unit:'kg'},
-                    {index:23, name: '수입무연탄(연료용)',unit:'kg'},
-                    {index:24, name: '수입무연탄(원료용)',unit:'kg'},
-                    {index:25, name: '유연탄(연료용)',unit:'kg'},
-                    {index:26, name: '아역청탄',unit:'kg'},
-                    {index:27, name: '코크스',unit:'kg'},
+                    {index:13, name: '항공용가솔린',unit:'L'},
+                    {index:14, name: '제트용가솔린',unit:'L'},
+                    {index:15, name: '제트용등유',unit:'L'},
+                    {index:16, name: '아스팔트',unit:'kg'},
+                    {index:17, name: '윤활유',unit:'L'},
+                    {index:18, name: '석유코크',unit:'kg'},
+                    // {index:19, name: '부생연료1호',unit:'L'},
+                    // {index:20, name: '부생연료2호',unit:'L'},
+                    {index:21, name: '천연가스(LNG)',unit:'kg'},
+                    // {index:22, name: '도시가스(LNG)',unit:'Nm^3'},
+                    // {index:23, name: '도시가스(LPG)',unit:'Nm^3'},
+                    {index:24, name: '국내무연탄',unit:'kg'},
+                    {index:25, name: '수입무연탄(연료용)',unit:'kg'},
+                    {index:26, name: '수입무연탄(원료용)',unit:'kg'},
+                    {index:27, name: '유연탄(연료용)',unit:'kg'},
+                    {index:28, name: '아역청탄',unit:'kg'},
+                    {index:29, name: '코크스',unit:'kg'},
                 ]
                 var unit_s =fule_info_list[index.value-1].unit
                 function click_regi_btn(unit_s){

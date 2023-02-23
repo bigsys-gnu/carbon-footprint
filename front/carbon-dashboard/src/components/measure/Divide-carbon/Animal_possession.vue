@@ -18,10 +18,12 @@
             <input type="text" class="addInfo_input" id ="building_name_input" placeholder="본관 앞 마당" style="margin-left:40px">
         </div>
         <div class="add_info_divide">동물 관리 방법
-            <select v-model="care" class="addInfo_input" id="operating_entity_input" style="margin-left:40px">
-                <option  v-for="animal in animal_care_list" :value="animal">{{animal}}</option>
+            <select v-model="care" class="addInfo_input" id="operating_entity_input" style="margin-left:40px" v-if="detail=='산란계'||detail=='육계'||detail=='기타닭'||detail=='오리'||detail=='거위'">
+                <option  v-for="animal in animal_care_list_with" :value="animal">{{animal}}</option>
             </select>
-            
+            <select v-model="care" class="addInfo_input" id="operating_entity_input" style="margin-left:40px" v-else>
+                <option  v-for="animal in animal_care_list" :value="animal">{{animal}}</option>
+            </select>    
         </div>
         <div class="add_info_divide">가축 유형
             <select v-model="detail" class="addInfo_input" id="supplier_drop" style="margin-left:70px">
@@ -65,7 +67,7 @@ import {computed ,ref} from "vue"
         setup(){
             const store = useStore()
             var detail = ref('육성우')
-            var care = ref('혐기성 늪')
+            var care = ref('혐기성늪')
             var animal_list = [
                     '육성우',
                     '착유우',
@@ -93,7 +95,12 @@ import {computed ,ref} from "vue"
                 '목장/방목',
                 '일일살포',
                 '소화조',
-                '연료로사용'
+                '연료로사용',
+                '기타'
+            ]
+            var animal_care_list_with = [
+                'WithLitter',
+                'WithoutLitter'
             ]
             
             function click_regi_btn(){
@@ -127,7 +134,7 @@ import {computed ,ref} from "vue"
                 console.log(info_list)
                 store.commit("SetTableContent",info_list)
             }
-            return{animal_list,animal_care_list,click_regi_btn,detail,care}
+            return{animal_list,animal_care_list,animal_care_list_with,click_regi_btn,detail,care}
         },
         mounted(){
         }

@@ -9,7 +9,7 @@
                   <h class ="category_image2" v-if="number.index!=1">{{category.image}}</h>{{category.name}}
                   <button  class="Group_btn" id="deleGroupbtn" v-if="category.check==true" @click="DellGroup(category.name)"><img  class="Group_btn_imge" src="@/assets/deleteBtn.png"> </button>      
                   <button  class="Group_btn" v-if="category.check==true" @click="AddGroup(category.name, number.index)"><img class="Group_btn_imge" src="@/assets/addBtn.png"></button>
-                  <button class="Group_btn"  v-if="category.check==true" @click="EditGroup()"><img class="Group_btn_imge" src="@/assets/editBtn.png" ></button>
+                  <button class="Group_btn"  v-if="category.check==true" @click="EditGroup(category.name)"><img class="Group_btn_imge" src="@/assets/editBtn.png" ></button>
               </li>
             </div>    
         </li>
@@ -85,8 +85,8 @@ export default {
       store.commit("SetGroupDepth", index);
       // store.commit("InsightAddY",-1);
     }
-    function EditGroup(){
-
+    function EditGroup(name){
+      store.commit("OnGroupEditPopup", name);
       // store.commit("InsightAddY",-1);
     }
     function DellGroup(name){
@@ -115,7 +115,7 @@ export default {
         })
         .finally(() => {})
     }
-    async function title_get_list_(){
+    async function title_get_list(){
         await axios.get("Company/Organization/Simple/samsung",config).then(res => {
             console.log(res.data)
             this.list_category =  res.data
@@ -129,6 +129,7 @@ export default {
             router.push('/');
         })
         .finally(() => {})
+
     }
     return{
         check,
@@ -137,7 +138,7 @@ export default {
         select_group,
         select_category,
         leave_category,
-        title_get_list_,
+        title_get_list,
         OffEditGroup,
         AddGroup,
         EditGroup,
@@ -145,7 +146,7 @@ export default {
     }
   } ,
   created(){
-      this.title_get_list_()
+      this.title_get_list()
   },
 }
 </script>

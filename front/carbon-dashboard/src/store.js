@@ -13,11 +13,13 @@ export default createStore({
         })
     ],
     state: {
+       
         EditGroups : false,
         GroupPreview : false,
         EditTable : false,
         Group_tree :[],
         GroupAddBtn : false,
+        GroupEditBtn : false,
         group_list:[],
         depth:0,
         CheckedNode : "", //그룹 구조에 수정,삭제, 추가 기준 노드
@@ -79,12 +81,7 @@ export default createStore({
         set_scopes(state,arr){
             state.scopes=arr
         },
-        OnEdit(state){
-            state.EditGroups = true;
-        },
-        OffEdit(state){
-            state.EditGroups = false;
-        },
+        
         OnGroupPreview(state,corrent,com){
             state.GroupPreview = corrent;
             state.group_tree_selected_company = com;
@@ -115,6 +112,19 @@ export default createStore({
         },
         OffGroupAddPopup(state){
             state.GroupAddBtn = false
+        },
+        OnGroupEditPopup(state, group_name){
+            state.GroupEditBtn = true
+            state.group_name=group_name
+        },
+        OffGroupEditPopup(state){
+            state.GroupEditBtn = false
+        },
+        OnEdit(state){
+            state.EditGroups = true;
+        },
+        OffEdit(state){
+            state.EditGroups = false;
         },
         AddGroupList(state,item){
             if(item==1){

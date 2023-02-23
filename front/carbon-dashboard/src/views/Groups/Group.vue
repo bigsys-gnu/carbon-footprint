@@ -4,6 +4,7 @@
         <navigation class="navigation"/>
         <div class="contents">
             <AddPopup></AddPopup>
+            <EditPopup></EditPopup>
             <GroupHeader/>
             <!--  <PinchScrollZoom  ref="zoomer"       :translate-x="150"
       :translate-y="150" :width="1400" :height="800" :scale="scale"       @scaling="(e) => onEvent('scaling', e)"
@@ -74,6 +75,7 @@ import GroupPreview from "@/components/groups/PreviewEmission"
 import GroupPreviewDetail from "@/components/groups/PreviewDetailEmission.vue"
 import GroupPreviewInfo from   "@/components/groups/PreviewInfo.vue"
 import AddPopup from "@/components/groups/AddPopup.vue"
+import EditPopup from "@/components/groups/EditPopup.vue";
 import PinchScrollZoom, { PinchScrollZoomEmitData } from "@coddicat/vue3-pinch-scroll-zoom";
 //import EditGroup from  "@/components/groups/Date.vue"
 
@@ -87,7 +89,8 @@ import PinchScrollZoom, { PinchScrollZoomEmitData } from "@coddicat/vue3-pinch-s
             GroupPreview,
             GroupPreviewDetail,
             GroupPreviewInfo,
-            AddPopup
+            AddPopup,
+            EditPopup,
         },
         setup(){
             const store = useStore(); //vuex 사용

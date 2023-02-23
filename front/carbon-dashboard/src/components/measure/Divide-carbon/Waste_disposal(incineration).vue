@@ -106,12 +106,12 @@ import {ref,computed} from 'vue'
                     "용매",
                     "플라스틱",
                     "고무",
-                    "건설및파쇄잔해물",
+                    "건설및파쇄잔재물",
                     "기타",
                     "하수슬러지",
                     "폐수슬러지",
                     "병원성폐기물",
-                    "역상폐기물"
+                    "액상폐기물"
             ])
             const store = useStore()
             function click_regi_btn(){
