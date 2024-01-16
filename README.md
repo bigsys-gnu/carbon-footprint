@@ -25,11 +25,24 @@ nodejs와 npm 설치
 ```
 cd ./src/front/carbon-dashboard
 ```
-carbon-dashboard 디렉토리로 이동
+carbon-dashboard 디렉터리로 이동
 ```
 rm -r node_modules
 ```
-기존의 node_modules 디렉토리 삭제
+기존의 node_modules 디렉터리 삭제
 ```
 npm install
 ```
+
+
+### 실행
+```
+cd ./src/front/carbon-dashboard
+```
+carbon-dashboard 디렉터리로 이동
+반드시 carbon-dashboard 디렉토리에서 실행시켜야함
+```
+npm serve
+```
+
+npm serve 명령어 실행 후 나오는 local 주소에 접속
