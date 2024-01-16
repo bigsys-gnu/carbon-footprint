@@ -21,12 +21,15 @@ carbon-footprint 프로젝트에서 활용되는 모든 api가 동작하는 서�
 ```
 apt install nodejs npm  
 ```
+nodejs와 npm 설치
 ```
 cd ./src/front/carbon-dashboard
 ```
+carbon-dashboard 디렉토리로 이동
 ```
 rm -r node_modules
 ```
+기존의 node_modules 디렉토리 삭제
 ```
 npm install
 ```
