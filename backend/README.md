@@ -1,143 +1,158 @@
-# carbon-footprint 프로젝트의 서버
+# 백엔드 — 탄소 발자국 추적 프로그램
 
-# 서버 실행 방법
-## 1. 우분투 20.04 환경을 준비합니다.
-## 2. 해당 환경에 docker와 docker-compose를 설치합니다.
-## 3. 이 깃허브에서 코드를 git clone "repository" 하여 가져옵니다.
-## 4. CarbonServerDjango 디렉토리에서 bash runServer.sh를 실행합니다.
-## 5. 해당 서버에 접속하여 제대로 동작하는지 확인합니다.
-이 서버의 경우 Api 서버이며, ~서버 ip/{사용자가 설정한 포트 번호}/swagger로 이동하면 Api에 관한 설명을 확인할 수 있습니다.
+carbon-footprint 프로젝트의 API 서버입니다.  
+탄소배출량 산정·저장·조회를 담당하며, 프론트엔드 대시보드에 REST API를 제공합니다.
 
-## 서버 실행 시 주의 사항
-.env 파일과 config.py 보안 상의 이유로 파일이 제공되지 않습니다. 본인의 원하는 형태로 작성하여 주십시요. 
+---
 
+## 기술 스택
 
-logs 폴더는 생성하지 않은 상태입니다. 해당 폴더를 생성한 후, 해당 폴더에 Server.log 파일을 생성해 주십시요.
+- Python / Django
+- MySQL (Docker)
+- Docker + docker-compose
+- Swagger (API 문서)
 
+---
 
-## runServer.sh 셸스크립트 실행 시 선행 조건
-git clone한 디렉토리 위의 디렉토리에 CarMigrate, ComMigrate, HuMigrate 폴더가 존재해야 합니다.
+## 서버 실행 방법
 
+1. **Ubuntu 20.04 환경을 준비합니다.**
 
+2. **Docker와 docker-compose를 설치합니다.**
 
-docker-compose가 빌드 될 때 MySQL 도커가 실행되는 도커 볼륨에 .env 파일에서 정의한 데이터베이스의 이름이 존재하지 않으면 실행되지 않습니다.
+3. **저장소를 clone합니다.**
+   ```bash
+   git clone https://github.com/bigsys-gnu/carbon-footprint.git
+   ```
 
+4. **`backend/` 디렉터리에서 실행 스크립트를 실행합니다.**
+   ```bash
+   cd carbon-footprint/backend
+   bash runServer.sh
+   ```
 
+5. **서버 동작을 확인합니다.**  
+   Swagger UI에 접속하여 API가 정상 동작하는지 확인합니다. (아래 [API 명세](#api-명세-및-사용법) 참고)
 
-mysql이 실행되는 도커의 경우, .env 파일에서 정의한 도커 볼륨을 사용하여 생성됩니다.
+---
 
-## config.py 예시
+## 실행 전 주의 사항
+
+### .env 및 config.py
+
+보안상의 이유로 `.env`와 `config.py` 파일은 제공되지 않습니다.  
+아래 예시를 참고하여 직접 작성해 주십시오.
+
+**config.py 예시**
+```python
 SECRET_KEY = "본인이 선택한 비밀 암호화 키"
 
-
 DATABASES = {
-
-
-
     "default": {
-
-
-
         "ENGINE": "django.db.backends.mysql",
-
-
-
         "NAME": "mysql에서 본인이 생성한 데이터베이스의 이름",
-
-
-
         "USER": "root",
-
-
-
         "PASSWORD": "본인이 선택한 비밀번호",
-
-
-
         "HOST": "db"
-
-
-
     }
-
-
-
 }
+```
 
-
-## .env 예시
+**.env 예시**
+```
 MYSQL_ROOT_PASSWORD="본인이 설정한 mysql의 루트 비밀번호"
-
-
-
 DB_VOLUME="데이터를 저장할 볼륨 이름"
-
-
-
 CARBON_PORT=본인이 사용할 포트 번호
+```
 
-# Api 명세 및 사용법
-## Api 명세 및 사용법의 경우는 서버를 실행한 후 swagger를 참조하길 바랍니다.
-## swagger 참조 방법
-해당 서버를 로컬 환경에서 실행한 경우 : 127.0.0.1:본인이 .env에서 지정한 외부 포트/swagger 
+### logs 폴더
 
+`logs/` 폴더는 저장소에 포함되어 있지 않습니다.  
+서버 실행 전 직접 생성하고, 그 안에 `Server.log` 파일을 만들어 주십시오.
 
+```bash
+mkdir logs
+touch logs/Server.log
+```
 
-해당 서버를 외부 서버에서 실행한 경우 : 외부 서버의 ip 주소:본인이 .env에서 지정한 외부 포트/swagger 
+### runServer.sh 실행 전 선행 조건
 
+`runServer.sh`를 실행하려면, **clone한 디렉터리의 상위 디렉터리**에 아래 세 폴더가 있어야 합니다.
 
+```
+../CarMigrate/
+../ComMigrate/
+../HuMigrate/
+```
 
-# 각 폴더에 대한 설명
-자세한 설명은 각 폴더 내부의 마크다운 파일을 참조하십시요.
+### MySQL 데이터베이스
 
-## 공통 사항
-- models.py는 데이터베이스의 스키마를 정의하는 파일입니다.
-- admin.py는 해당 폴더에서 정의된 스키마(models.py)를 관리자 페이지에 등록하는 파일입니다.
-- serializer.py는 데이터베이스에서 쿼리한 데이터를 코드에서 사용가능하도록 변환하는 파일입니다.
-- urls.py는 해당 폴더에서 정의한 함수들을 어떤 url을 통해 실행하도록 할지 정의하는 파일입니다.
-- view.py는 urls.py에서 정의된 경로에서 실행할 함수들이 정의된 파일입니다. api의 동장 방식을 변경하고 싶다면 가장 먼저 확인하여야 합니다.
-- dockerfile의 git clone에서 주소는 자신이 원하는 레포지토리로 변경하여 사용합니다.
+docker-compose 빌드 시, `.env`에서 정의한 데이터베이스 이름이 MySQL 도커 볼륨에 존재하지 않으면 실행되지 않습니다.  
+MySQL 도커는 `.env`에서 정의한 도커 볼륨을 사용하여 생성됩니다.
 
+### ⚠️ Human 앱 로그인 코드 수정 (운영 전 필수)
 
+로그인 API 일부가 테스트 코드 실행을 위해 변경된 상태입니다.  
+실제 운영 전 반드시 아래와 같이 수정해야 합니다.
 
-## Carbon
-- 탄소 배출량의 입력과 계산과 관련된 폴더(App)
-- 탄소 배출량의 정보를 저장하는 데이터베이스를 정의하는 부분과 해당 값들의 입출력을 위한 파일들로 구성
+`Human/views.py`의 `LogInView` 클래스 `post` 함수에서:
 
-## CarbonConstant
-- 탄소 배출량의 계산을 위한 폴더
-- 탄소 배출량을 모두 동일한 단위로 환산하기 위한 상수들과 수식을 class 형태로 정의 및 저장
+```python
+# 수정 전 (테스트용 — 운영 환경에서 사용 금지)
+if (PW == User.password)
 
-## Company
-- 웹페이지를 사용하는 회사의 정보를 저장하기 위한 폴더(App)
-- 회사의 정보를 데이터베이스에 정의하는 부분과 해당 값들의 입출력을 위한 파일들로 구성
+# 수정 후 (운영용)
+if check_password(PW, User.password)
+```
 
-## Human
-- 회사의 직원과 웹페이지에 회원가입한 사용자를 관리하기 위한 폴더(App)
-- 직원과 사용자의 정보를 정의하는 부분과 해당 값들의 입출력을 위한 파일들로 구성
-- 로그인 api의 일부가 테스트 코드의 실행을 위해 변경되어 있으므로 실제 실행 전에 반드시 코드 수정.
-- LogInView class의 post 함수에서 if (PW == User.password)를 if check_password(PW, User.password)로 수정할 것
+---
 
-## logs
-- 서버가 동작하면서 발생한 로그를 저장하기 위한 폴더
+## API 명세 및 사용법
 
-## Server
-- 위에서 설명한 모든 것들을 관리하기 위한 App
-- 해당 서버에 접근한다면 가장 첫번째로 만나게 되는 폴더 
+서버 실행 후 Swagger UI에서 전체 API 목록과 사용법을 확인할 수 있습니다.
 
-## Swag
-- Api문서화 도구인 swagger 작성을 위해 필요한 내용을 저장하는 폴더
-- 반드시 필요한 것은 아니지만 없을 경우 코드 파일에 불필요한 코드가 길어저 생성
+| 실행 환경 | Swagger 접속 주소 |
+|-----------|------------------|
+| 로컬 실행 | `http://127.0.0.1:{CARBON_PORT}/swagger` |
+| 외부 서버 | `http://{서버 IP}:{CARBON_PORT}/swagger` |
 
-## TestDir
-- 각 Api들이 이상없이 동작하는지 확인하기 위한 테스트 코드들이 저장된 폴더
+※ `CARBON_PORT`는 `.env` 파일에서 설정한 포트 번호입니다.
 
-# 폴더 외의 기타 파일에 대한 설명
-## Dockerfile
-- CarbonServerDjango를 실행하기 위한 가상환경(도커)를 정의하는 파일
+---
 
-## docker-compose.yml
-- 위의 Dockerfile과 mysql을 실행하기 위해 필요한 내용들을 모두 합쳐 1번에 서버을 실행시켜주는 파일
+## 디렉터리 구조 및 설명
 
-## runServer.sh
-- 소스코드가 업데이트 되었을 경우 소스코드의 업데이트와 서버의 실행을 모두 1번에 실행시켜주는 셸스크립트
+각 폴더의 자세한 설명은 해당 폴더 내부의 마크다운 파일을 참조하십시오.
+
+### 공통 파일 설명
+
+| 파일 | 설명 |
+|------|------|
+| `models.py` | 데이터베이스 스키마 정의 |
+| `admin.py` | 관리자 페이지에 스키마 등록 |
+| `serializer.py` | DB 쿼리 데이터를 코드에서 사용 가능한 형태로 변환 |
+| `urls.py` | 함수별 URL 경로 정의 |
+| `views.py` | URL에 매핑된 함수 정의. API 동작 변경 시 가장 먼저 확인할 파일 |
+
+> `Dockerfile`의 `git clone` 주소는 본인이 원하는 레포지토리 주소로 변경하여 사용합니다.
+
+### 앱(App) 폴더
+
+| 폴더 | 설명 |
+|------|------|
+| `Carbon/` | 탄소배출량 입력·계산 관련 앱. 배출량 정보를 저장하는 DB 정의 및 입출력 파일로 구성 |
+| `CarbonConstant/` | 탄소배출량 산정에 필요한 상수와 수식을 class 형태로 정의. 모든 에너지원을 동일 단위(CO₂eq)로 환산 |
+| `Company/` | 웹페이지를 사용하는 회사 정보를 저장하는 앱. 회사 정보 DB 정의 및 입출력 파일로 구성 |
+| `Human/` | 회사 직원 및 회원가입 사용자 관리 앱. ⚠️ 운영 전 로그인 코드 수정 필요 (위 주의사항 참고) |
+| `Server/` | 모든 앱을 통합 관리하는 최상위 앱. 서버 진입점 |
+| `Swag/` | Swagger 문서화 관련 파일 저장 폴더. 없을 경우 각 코드 파일에 불필요한 코드가 길어짐 |
+| `TestDir/` | 각 API의 정상 동작 여부를 확인하기 위한 테스트 코드 |
+| `logs/` | 서버 동작 중 발생한 로그 저장 폴더 (직접 생성 필요 — 위 주의사항 참고) |
+
+### 기타 파일
+
+| 파일 | 설명 |
+|------|------|
+| `Dockerfile` | Django 서버 실행을 위한 Docker 가상환경 정의 |
+| `docker-compose.yml` | Dockerfile과 MySQL을 합쳐 한 번에 서버를 실행시켜주는 파일 |
+| `runServer.sh` | 소스코드 업데이트와 서버 실행을 한 번에 처리하는 셸 스크립트 |

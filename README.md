@@ -1,48 +1,100 @@
-# carbon-footprint
+# 탄소 발자국 추적 프로그램
 
+경상국립대학교 빅데이터시스템소프트웨어연구실에서 개발한 탄소배출량 정량화 및 시각화 오픈소스 시스템입니다.
 
+---
 
-## CarbonServerDjango
-carbon-footprint 프로젝트에서 활용되는 모든 api가 동작하는 서버. 
+## 구성
 
+### backend/
+carbon-footprint 프로젝트에서 활용되는 모든 API가 동작하는 서버.  
+주로 DB에 필요 정보를 질의하고 해당 값을 요청자에게 반환합니다.  
+자세한 실행 방법은 [`backend/README.md`](backend/README.md)를 참고하십시오.
 
+### frontend/
+탄소배출량 데이터를 시각화하고 관리하는 대시보드. 터미널에서 실행합니다.  
+자세한 내용은 [`frontend/README.md`](frontend/README.md)를 참고하십시오.
 
-주로 db에게 필요 정보를 질의하고 해당 값을 요청자에게 반환함.
+---
 
+## 설치 및 실행
 
-## carbon-footprint
+### 백엔드 서버
 
-터미널에서 실행하기
+백엔드는 Docker 기반으로 실행됩니다. [`backend/README.md`](backend/README.md)의 안내를 따라 주십시오.
 
-## How to install
+### 프론트엔드
 
+**사전 준비 — Node.js, npm 설치**
 
-### Project setup
+```bash
+apt install nodejs npm
 ```
-apt install nodejs npm  
-```
-nodejs와 npm 설치
-```
-cd ./src/front/carbon-dashboard
-```
-carbon-dashboard 디렉터리로 이동
-```
+
+**설치**
+
+```bash
+# frontend/ 디렉터리로 이동
+cd ./frontend
+
+# 기존 node_modules 삭제 (재설치 시)
 rm -r node_modules
-```
-기존의 node_modules 디렉터리 삭제
-```
+
+# 패키지 설치
 npm install
 ```
 
+**실행**
 
-### 실행
-```
-cd ./src/front/carbon-dashboard
-```
-carbon-dashboard 디렉터리로 이동
-반드시 carbon-dashboard 디렉토리에서 실행시켜야함
-```
-npm serve
+```bash
+# 반드시 frontend/ 디렉터리에서 실행해야 합니다
+cd ./frontend
+npm run serve
 ```
 
-npm serve 명령어 실행 후 나오는 local 주소에 접속
+실행 후 터미널에 출력되는 local 주소에 접속합니다.
+
+---
+
+## 관련 논문
+
+본 시스템은 아래 논문에서 개발 및 활용되었습니다.
+
+> **탄소배출량 정량화 시스템을 통한 탄소 배출 분석: 국내 에너지원별 배출량**
+>
+> 김하얀, 정혜미, 최문석, 정대호, 김재호  
+> **정보과학회논문지**, 제53권 제5호, pp. 390–400, 2026년 5월  
+> https://doi.org/10.5626/JOK.2026.53.5.390
+
+### 주요 분석 결과 (2022년 기준)
+
+- 에너지원별 탄소배출량: **전력(61.10%) > 석탄(38.87%) > 천연가스(0.03%)**
+- 에너지 사용량 비중: 석탄류(46.17%), 가스류(36.21%), 전력(13.91%)
+- 부문별 배출량: 산업부문이 **93.9%** 로 가장 높음
+- 산업부문 내 업종: 금속(40.1%) > 화공(26.9%) > 에너지산업(23.6%)
+- 전력 사용처 내 업종: 제조업이 **53.03%**
+
+---
+
+## 저자
+
+| 이름 | 소속 | 연락처 |
+|------|------|--------|
+| 김하얀 | 국방기술진흥연구소 | gkdis@krit.re.kr |
+| 정혜미 | 경상국립대학교 | gpal6072@naver.com |
+| 최문석 | 경상국립대학교 | daniel0701@naver.com |
+| 정대호 | 경상국립대학교 | mon08290@naver.com |
+| **김재호** (교신저자) | 경상국립대학교 소프트웨어공학과 | jaeho.kim@gnu.ac.kr |
+
+---
+
+## 연구비 지원
+
+본 연구는 과학기술정보통신부 한국연구재단(NRF-2021R1F1A1063524)과  
+2025년도 경상국립대학교 글로컬대학30사업의 지원을 받아 수행되었습니다.
+
+---
+
+## 라이선스
+
+[LICENSE](LICENSE) 파일을 참고하세요.
